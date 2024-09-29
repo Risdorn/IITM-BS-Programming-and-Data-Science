@@ -1,0 +1,519 @@
+\documentclass[a4paper]{article}
+\input{head}
+\usepackage{pdfpages}
+\usetikzlibrary{positioning}
+
+\newlength{\originalVOffset}
+\newlength{\originalHOffset}
+\setlength{\originalVOffset}{\voffset}   
+\setlength{\originalHOffset}{\hoffset}
+
+\begin{document}
+
+\fancyhead[c]{}
+\hrule \medskip
+\begin{minipage}{0.295\textwidth}
+\raggedright
+Rishabh Indoria\\
+21F3001823
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\centering
+\LARGE
+Software Testing
+\end{minipage}
+\begin{minipage}{0.295\textwidth}
+\raggedleft
+\today \hfill \\
+\end{minipage}
+\medskip \hrule
+\bigskip
+
+\section{Introduction}
+\subsection{Motivation}
+\begin{itemize}
+    \item \textbf{Introduction to Software Testing} by Paul Ammann and Jeff Offutt, \textbf{The Art of Software Testing} by Glenford J. Myers, \textbf{Software Testing: A Craftsman's Approach} by Paul C. Jorgensen, \textbf{Agile Testing: A practical guide for Testers and Agile Teams} by Lisa Crispin and Janet Gregory.
+    \item Software is ubiquitous; Such software should be of very high quality, offer good performance in terms of response time, performance and also have no errors.
+    \item It is no longer feasible to shut down a malfunctioning system in order to restore safety.
+    \item Errors in software can cost lives, huge financial losses, or simply a lot of irritation.
+    \item Testing is the \textbf{predominantly used} technique to find and eliminate errors in software.
+\end{itemize}
+\subsection{Software Development Life Cycle}
+\begin{itemize}
+    \item \textbf{SDLC}: term used by the software industry to define a process for designing, developing, testing and maintaining a high quality software product.
+    \item The goal is to use SDLC defined processes to develop a high quality software product that meets customer demands.
+    \item \textbf{Planning}: Includes clearly identifying customer and/or market needs, pursuing a feasibility study and arriving at an initial set of requirements.
+    \item \textbf{Requirements definition}: Includes documenting detailed requirements of various kinds: System-level, functional, software, hardware, quality requirements etc. They get approved by appropriate stakeholders.
+    \item \textbf{Requirements analysis}: Includes checking and analyzing requirements to ensure that they are consistent, complete and match the feasibility study and market needs.
+    \item \textbf{Design}: Identifies all the modules of the software product, details out the internals of each module, the implementation details and a skeleton of the testing details.
+    \item \textbf{Architecture}: Defines the modules, their connections and other dependencies, the hardware, database and its access etc.
+    \item \textbf{Development}: The design documents, especially that of low-level design, is used to implement the product. There are usually coding guidelines to be followed by the developers. Extensive unit testing and debugging are also done, usually by the developers. Tracking is done by project management team.
+    \item \textbf{Testing}: Involves testing only where the product is thoroughly tested, defects are reported, fixed and re-tested, until all the functional and quality requirements are met.
+    \item \textbf{Maintenance}: Done post deployment of product. Add new features as desired by the customer/market. Fix errors, if any, in the software product. Test cases from earlier phases are re-used here, based on need.
+    \item \textbf{V-model}: It is a model that focuses on verification and validation. Follows the traditional SDLC life-cycle: Requirements, Design, Implementation, Testing, Maintenance.
+    \item \textbf{Agile model}: Agile methodologies are adaptive and focus on fast delivery of features of a software product. All the SDLC steps are repeated in incremental iterations to deliver a set of features. Extensive customer interactions, quick delivery and rapid response to change in requirements.
+    \item \textbf{Other Activities}: Project management, includes team management. Project documentation(Traceability matrix is a document that links each artifacts of development phase to those of other phases). Quality Inspection.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \includegraphics[width=\textwidth]{Degree/static/ST_v_model.png}
+            \caption{V-Model}
+            \label{fig:ST-v-model}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \includegraphics[width=\textwidth]{Degree/static/ST_agile_model.png}
+            \caption{Agile Model}
+            \label{fig:ST-agile-model}
+        \end{subfigure}
+        \caption{Model Visualization}
+        \label{fig:ST-model-visualizations}
+    \end{figure}
+\end{itemize}
+\subsection{Testing Terminologies}
+\begin{itemize}
+    \item \textbf{Validation}: The process of evaluating software at the end of software development to ensure compliance with intended usage. i.e., checking if the software meets its requirements.
+    \item \textbf{Verification}: The process of determining whether the products of a given phase of the software development process fulfill the requirements established at the start of that phase.
+    \item \textbf{Fault}: A static defect in the software. It could be a missing function or a wrong function in code.
+    \item \textbf{Failure}: An external, incorrect behavior with respect to the requirements or other description of the expected behavior. A failure is a manifestation of a fault when software is executed.
+    \item \textbf{Error}: An incorrect internal state that is the manifestation of some fault.
+    \item \textbf{Test case}: A test case typically involves inputs to the software and expected outputs. A failed test case indicates an error. A test case also contains other parameters like test case ID, traceability details etc.
+    \item \textbf{Unit Testing}: Done by developer during coding.
+    \item \textbf{Integration Testing}: Various components are put together and tested. Components could be only software or software and hardware components.
+    \item \textbf{System Testing}: Done with full system implementation and the platform on which the system will be running.
+    \item \textbf{Acceptance Testing}: Done by end customer to ensure that the delivered products meet the committed requirements.
+    \item \textbf{Beta Testing}: Done in a (so-called) beta version of the software by end users, after release.
+    \item \textbf{Functional Testing}: Done to ensure that the software meets its specified functionality.
+    \item \textbf{Stress Testing}: Done to evaluate how the system behaves under peak/unfavorable conditions.
+    \item \textbf{Performance Testing}: Done to ensure the speed and response time of the system.
+    \item \textbf{Usability Testing}: Done to evaluate the user interface, aesthetics.
+    \item \textbf{Regression Testing}: Done after modifying/upgrading a component, to ensure that the modification is working correctly, and other components are not damaged by the modification.
+    \item \textbf{Black-Box Testing}: A method of testing that examines the functionalities of a software/system without looking into its internal design or code.
+    \item \textbf{White-Box Testing}: A method of testing that test the internal structure of the design or code of a software.
+    \item \textbf{Test Design}: Most critical job in testing. Need to design effective test cases. Apart from specifying the inputs, this involves defining the expected outputs too. Typically, cannot be automated.
+    \item \textbf{Test Automation}: Involves converting the test cases into executable scripts. Need to specify how to reach deep parts of the code using just inputs, Observability and Controllability.
+    \item \textbf{Test Execution}: Involves running the test on the software and recording the results. Can be fully automated.
+    \item \textbf{Test Evaluation}: Involves evaluating the results of testing, reporting identified errors. A difficult problem is to isolate faults, especially in large software and during integration testing.
+    \item \textbf{Testing goals}: Organizations tend to work with one or more of the following levels\\
+    \textbf{Level 0}: There is no difference between testing and debugging.\\
+    \textbf{Level 1}: The purpose of testing is to show correctness.\\
+    \textbf{Level 2}: The purpose of testing is to show that software doesn't work.\\
+    \textbf{Level 3}: The purpose of testing is not to prove anything specific, but to reduce the risk of using the software.\\
+    \textbf{Level 4}: Testing is a mental discipline that helps all IT professionals develop higher quality software.
+    \item \textbf{Controllability}: Controllability is about how easy it is to provide inputs to the software module under test, in terms of reaching the module and running the test cases on the module under test.
+    \item \textbf{Observability}: Observability is about how easy it is to observe the software module under test and check if the module behaves as expected.
+\end{itemize}
+
+\section{Graphs}
+\subsection{Basics}
+\begin{itemize}
+    \item A graph is a tuple $G=(V,E)$ where $V$ is a set of \textbf{nodes/vertices}, and $E\subseteq(V\times V)$ is a set of \textbf{edges}.
+    \item Graphs can be \textbf{directed} or \textbf{undirected}.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}[node distance={15mm}, thick, main/.style = {draw, circle}]
+                \node[main] (1) {$u$};
+                \node[main] (2) [right of=1] {$v$};
+                \node[main] (3) [below of=1] {$w$};
+                \node[main] (4) [right of=3] {$x$};
+                \node[main] (5) [above right of=4] {$y$};
+
+                \draw (1) -- (2);
+                \draw (1) -- (3);
+                \draw (1) -- (4);
+                \draw (3) -- (4);
+                \draw (4) -- (5);
+            \end{tikzpicture} 
+            \caption{A simple undirected graph}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}[node distance={15mm}, thick, main/.style = {draw, circle}]
+                \node[main] (1) {$p$};
+                \node[main] (2) [right of=1] {$r$};
+                \node[main] (3) [below of=1] {$q$};
+
+                \draw[->] (1) -- (2);
+                \draw[->] (1) -- (3);
+                \draw[->] (3) -- (2);
+                \draw[->] (2) to [out=45,in=0,looseness=5] (2);
+            \end{tikzpicture} 
+            \caption{A directed graph}
+        \end{subfigure}
+    \end{figure}
+    \item Graphs can finite or infinite.
+    \item The \textbf{degree} of a vertex is the number of edges that are connected to it. Edges connected to a vertex are said to be \textbf{incident} on the vertex.
+    \item There are designated special vertices like \textbf{initial} and \textbf{final} vertices. These vertices indicate beginning and end of a property that the graph is modeling.
+    \item Typically, there is only one initial vertex, but there could be several final vertices.
+    \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[node distance={15mm}, thick, main/.style = {draw, circle}]
+            \node[main] (1) {$u$};
+            \node[main] (2) [right of=1] {$v$};
+            \node[main] (3) [below of=1] {$w$};
+            \node[main, minimum size=0.5cm] (33) [below of=1] {};
+            \node[main] (4) [right of=3] {$x$};
+            \node[main] (5) [above right of=4] {$y$};
+
+            \draw (0,0.5) -- (1);
+            \draw (1) -- (2);
+            \draw (1) -- (3);
+            \draw (1) -- (4);
+            \draw (3) -- (4);
+            \draw (4) -- (5);
+        \end{tikzpicture}
+        \caption{Graph with initial and final vertices}
+    \end{figure}
+    \item Most of these graphs will have \textbf{labels} associated with vertices and edges. Labels or annotations could be details about the artifact that the graphs are modelling. Tests are intended to cover the graph in some way.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \begin{verbatim}
+                if(x<y){
+                y = 0;
+                x = x+1;
+                }else{
+                x = y+1;
+                }
+                z = x+1;
+            \end{verbatim}
+            \caption{A sample code}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \begin{myverbbox}{\edgeONE}
+                x>=y
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeTWO}
+                x<y
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexONE}
+                x = y+1
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexTWO}
+                y = 0
+                x = x+1
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexTHREE}
+                z = x+1
+            \end{myverbbox}
+            \hspace{-2cm}
+            \begin{tikzpicture}[node distance={15mm}, thick, main/.style = {draw, circle}]
+                \node[main] (1) {};
+                \node[main] (2) [below right of=1] {};
+                \node at (0.5, -1.3) {\vertexONE};
+                \node[main] (3) [below left of=1] {};
+                \node at (-3.5, -1.3) {\vertexTWO};
+                \node[main] (4) [below left of=2] {};
+                \node at (-0.5, -2.3) {\vertexTHREE};
+                \node at (-0.5,-0.5) {\edgeONE};
+                \node at (-2.5, -0.5) {\edgeTWO};
+
+                \draw[->] (0,0.5) -- (1);
+                \draw[->] (1) -- (2);
+                \draw[->] (1) -- (3);
+                \draw[->] (2) -- (4);
+                \draw[->] (3) -- (4);
+            \end{tikzpicture}
+            \caption{A Control Flow Graph}
+        \end{subfigure}
+        \caption{Example of a CFG}
+    \end{figure}
+    \item A \textbf{path} is a sequence of vertices $v_1,v_2,...,v_n$ such that $(v_i,v_{i+1})\in E$.
+    \item \textbf{Length} of a path is the number of edges that occur in it. A single vertex path has length 0.
+    \item \textbf{Sub-path} of a path is a sub-sequence of vertices that occur in the path.
+    \item A vertex $v$ is \textbf{reachable} from some other vertex if there is a path connecting them.
+    \item An edge $e=(u,v)$ is \textbf{reachable} if there is a path that goes to vertex $u$ and then goes to vertex $v$.
+    \item A \textbf{test path} is a path that starts in an initial vertex and ends in a final vertex. These represent execution of test cases.
+    \item Some test paths can be executed by many test cases: \textbf{Feasible paths}.
+    \item Some test paths cannot be executed by any test case: \textbf{Infeasible paths}.
+    \item A test path $p$ \textbf{visits} a vertex $v$ if $v$ occurs in path $p$. A test path $p$ \textbf{visits} an edge $e$ if $e$ occurs in the path $p$.
+    \item A test path $p$ \textbf{tours} a path $q$ if $q$ is a sub-path of $p$.
+    \item When a test case $t$ executes a path, we call it the \textbf{test path} executed by $t$, denoted by $path(t)$.
+    \item The set of test paths executed by a set of test cases $T$ is denoted by $path(T)$.
+    \item \textbf{Test requirement} describes properties of test paths.
+    \item \textbf{Test Criterion} are rules that define test requirements.
+    \item \textbf{Satisfaction}: Given a set $TR$ of test requirements for a criterion $C$, a set of tests $T$ satisfies $C$ on a graph iff for every test requirement in $t\in TR$, there is a test path in $path(T)$ that meets the test requirement $t$.
+    \item \textbf{Structural Coverage Criteria}: Defined on a graph just in terms of vertices and edges.
+    \item \textbf{Data Flow Coverage Criteria}: Requires a graph to be annotated with references to variables and defines criteria requirements based on the annotations.
+\end{itemize}
+
+\subsection{Elementary Graph Algorithms}
+\begin{itemize}
+    \item Two standard ways of representing graphs: \textbf{adjacency matrix} or \textbf{adjacency lists}.
+    \item Adjacency list representation provides a compact way to represent \textbf{sparse} graphs, i.e., graphs for which $|E|$ is much less than $|V|^2$. For each $u\in V$, $Adj[u]$ contains all vertices $v$ such that $(u,v)\in E$, i.e., it contains all edges incident with $u$. Represented in $\Theta(|V|+|E|)$ memory.
+    \item Adjacency matrix representation provides a compact way to represent \textbf{dense} graphs, i.e., graphs for which $|E|$ is close to $|V|^2$. This is a $|V|\times |V|$ matrix, where $a_{ij}=1$ if there is an edge going from $i$ to $j$.
+    \item \textbf{Breadth First Search}: Computes the "distance" from $s$ to each reachable vertex.
+    \begin{algorithm}[H]
+        \caption{Breadth First Search}\label{alg:ST-BFS}
+        \begin{algorithmic}[1]
+            \Statex \Call{BFS}{$G$}
+            \For{each vertex $u\in G,V-\{s\}$}
+                \State $u.color$ = $WHITE$, $u.d=\infty$, $u.\pi$ = NIL
+            \EndFor
+            \State $s.color$ = $BLUE$, $s.d=0$, $s.\pi$ = NIL
+            \State $Q$ = $\phi$
+            \State \Call{Enqueue}{$Q,s$}
+            \While{$Q\neq \phi$}
+                \State $u$ = \Call{Dequeue}{$Q$}
+                \For{each $v\in G.Adj[u]$}
+                    \If{$v.color$ == $WHITE$}
+                        \State $v.color$ = $BLUE$
+                        \State $v.d$ = $u.d$ + 1
+                        \State $v.\pi$ = $u$
+                        \State \Call{Enqueue}{$Q,v$}
+                    \EndIf
+                \EndFor
+                \State $u.color$ = $BLACK$
+            \EndWhile
+        \end{algorithmic}
+    \end{algorithm}
+    \item \textbf{Depth First Search}
+    \begin{algorithm}[H]
+        \caption{Depth First Search}
+        \begin{algorithmic}[1]
+            \Statex \Call{DFS}{$G$}
+            \For{each vertex $u\in G.V$}
+                \State $u.color$ = $WHITE$
+                \State $u.\pi$ = $NIL$
+            \EndFor
+            \State $time$ = 0
+            \For{each vertex $u\in G.V$}
+                \If{$u.color$ == $WHITE$}
+                    \State \Call{DFS-Visit}{$G,u$}
+                \EndIf
+            \EndFor
+            \Statex
+            \Statex \Call{DFS-Visit}{$G,u$}
+            \State $time$ = $time+1$
+            \State $u.d$ = $time$
+            \State $u.color$ = $GRAY$
+            \For{each $v\in G.Adj[u]$}
+                \If{$v.color$ == $WHITE$}
+                    \State $v.\pi$ = $u$
+                    \State \Call{DFS-Visit}{$G,v$}
+                \EndIf
+            \EndFor
+            \State $u.color$ = $BLACK$
+            \State $time$ = $time+1$
+            \State $u.f$ = $time$
+        \end{algorithmic}
+    \end{algorithm}
+\end{itemize}
+
+\subsection{Structural Graph Coverage}
+\begin{itemize}
+    \item \textbf{Node Coverage} requires that the test cases visit each node in the graph once. Test set $T$ satisfies node coverage on graph $G$ iff for every syntactically reachable node $n\in G$, there is some path $p$ in $path(T)$ such that $p$ visits $n$.
+    \item \textbf{Edge Coverage}: $TR$ contains each reachable path of length up to $1$, inclusive, in $G$. Edge coverage is slightly stronger than node coverage. Allowing length up to 1 allows edge coverage to subsume node coverage.
+    \item \textbf{Edge-Pair Coverage}: $TR$ contains each reachable path of length up to 2, inclusive in $G$. Paths of length up to 2 correspond to pairs of edges.
+    \item \textbf{Complete path coverage}: $TR$ contains all paths in $G$. Unfortunately, this can be an infeasible test requirement, due to loops.
+    \item \textbf{Specified path coverage}: $TR$ contains a set $S$ of paths, where $S$ is specified by the user/tester.
+    \item A path from $n_i$ to $n_j$ is \textbf{simple} if no node appears more than once, except possible the first and last node.
+    \item A \textbf{prime path} is a simple path that does not appear as a proper sub-path of any other simple path.
+    \item \textbf{Prime path coverage}: $TR$ contains each prime path in $G$. Ensures that loops are skipped as well as executed. It subsumes node and edge coverage.
+    \item \textbf{Tour with side trips}: A test path $p$ tours a sub-path $q$ with side trips iff every edge $q$ is also in $p$ in the same order. the tour can include a side trip, as long as it comes back to the same node.
+    \item \textbf{Tours with detours}: A test path $p$ tours a sub-path $q$ with detours iff every node in $q$ is also in $p$ in the same order. The tour can include a detour from node $n$ as long as it comes back to the prime path at a successor of $n$.
+    \item \textbf{Best Effort Touring}: Satisfy as many test requirements as possible without sidetrips. Allow sidetrips to try to satisfy remaining test requirements.
+    \item \textbf{Round trip path}: A prime path that starts and ends at the same node.
+    \item \textbf{Simple round trip coverage}: $TR$ contains at least one round trip path for each reachable node in $G$ that begins and ends in a round trip path.
+    \item \textbf{Complete round trip coverage}: $TR$ contains all round trip paths for each reachable node in $G$.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/ST_Structural_Coverage.png}
+        \caption{Structure Coverage Criteria Subsumption}
+        \label{fig:ST-structure-coverage}
+    \end{figure}
+\end{itemize}
+
+\subsection{Algorithms: Structural Graph Coverage Criteria}
+\begin{itemize}
+    \item There are two entities related to coverage criteria: Test requirement, and Test case as a test path, if the test requirement is feasible.
+    \item Test requirements for node and edge coverage are already given as a part of the graph modeling the software artifact. Test paths to achieve node and edge coverage can be obtained by simple modifications to BFS.
+    \item $TR$ for edge-pair coverage is all paths of length two in a given graph. Need to include paths that involve self-loops too.
+    \begin{algorithm}[H]
+        \caption{Simple Edge-Pair Algorithm}
+        \begin{algorithmic}[1]
+            \For{each node $u$ in the graph}
+                \For{each node $v$ in $Adj[u]$}
+                    \For{each node $w$ in $Adj[v]$}
+                        \State Output path $u--v--w$
+                    \EndFor
+                \EndFor
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+    \item Prime Path Algorithm
+    \begin{algorithm}[H]
+        \caption{Computing prime paths}
+        \begin{algorithmic}[1]
+            \State $Loops$ = [ ]
+            \State $Terminate$ = [ ]
+            \State $Q$ = $\phi$
+            \For{each $v\in G$}
+                \State \Call{Enqueue}{$Q,[v]$}
+            \EndFor
+            \While{$Q\neq \phi$}
+                \State $path$ = \Call{Dequeue}{$Q$}
+                \For{each $v\in G.Adj[path[-1]]$}
+                    \If{$v$ is a final vertice}
+                        \State $Terminate$ = $Terminate$ ++ ($path$ ++ $v$)
+                    \ElsIf{$v$ in $path$ and $v$ == $path[0]$}
+                        \State $Loops$ = $Loops$ ++ ($path$ ++ $v$)
+                    \ElsIf{$v$ in $path$}
+                        \State continue
+                    \Else
+                        \State \Call{Enqueue}{$Q, path$ ++ $v$}
+                    \EndIf
+                \EndFor
+            \EndWhile
+            \State \Return $Loops$, $Terminate$
+        \end{algorithmic}
+    \end{algorithm}
+    \item To enumerate test paths for prime path coverage: Start with the longest prime paths and extend each of them to the initial and the final nodes in the graph.
+\end{itemize}
+
+\subsection{Control Flow Graphs for Code}
+\begin{itemize}
+    \item Modelling control flow in code as graphs. Using structural coverage criteria to test control flow in code.
+    \item Typically used to test a particular function or procedure or a method.
+    \item A \textbf{Control Floe Graph} models all executions of a method by describing control structures.
+    \item \textbf{Nodes}: Statements or sequences of statements (basic blocks).
+    \item \textbf{Basic Block}: A sequence of statements such that if the first statement is executed, all statements will be (no branches).
+    \item \textbf{Edges}: Transfer of control from one statement to the next.
+    \item CFGs are often annotated with extra information to model data, this includes branch predicates, Definitions and/or uses.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \begin{verbatim}
+                x = 0;
+                while(x<y){
+                    y = f(x,y);
+                    if(y == 0){
+                        break;
+                    }else if(y<0){
+                        y = y*2;
+                        continue;
+                    }
+                    x = x+1;
+                }
+                print(y);
+            \end{verbatim}
+            \caption{While loop with break and continue}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \begin{myverbbox}{\vertexONE}
+                x = 0;
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeONE}
+                x<y;
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeTWO}
+                x>=y;
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexTWO}
+                y = f(x,y);
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeTHREE}
+                y == 0;
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeFOUR}
+                y<0;
+            \end{myverbbox}
+            \begin{myverbbox}{\edgeFIVE}
+                y>0;
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexTHREE}
+                x = x+1;
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexFOUR}
+                print(y);
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexFIVE}
+                break;
+            \end{myverbbox}
+            \begin{myverbbox}{\vertexSIX}
+                y = y*2;
+                continue;
+            \end{myverbbox}
+            \hspace{-2.5cm}
+            \begin{tikzpicture}[node distance={15mm}, thick, main/.style = {draw, circle}]
+                \node[main] (1) {1};
+                \node at (-0.5, 0) {\vertexONE};
+                \node[main] (2) [below of=1] {2};
+                \node at (-2.2, -2.05) {\edgeONE};
+                \node at (-0.3, -2.05) {\edgeTWO};
+                \node[main] (3) [below right of=2] {7};
+                \node at (0.8, -2.6) {\vertexFOUR};
+                \node[main, minimum size=0.5cm] (33) [below right of=2] {};
+                \node[main] (4) [below left of=2] {3};
+                \node at (-4, -2.6) {\vertexTWO};
+                \node at (-1.5, -3) {\edgeTHREE};
+                \node at (-2.2, -3.6) {\edgeFOUR};
+                \node at (-3.2, -3.1) {\edgeFIVE};
+                \node[main] (5) [below left of=4] {5};
+                \node at (-5, -3.7) {\vertexSIX};
+                \node[main] (6) [below right of=4] {4};
+                \node at (-0.5, -4) {\vertexFIVE};
+                \node[main] (7) [below of=4] {6};
+                \node at (-2, -4.8) {\vertexTHREE};
+                \node[main] (8) [below left of=5] {2};
+
+                \draw[->] (0,0.5) -- (1);
+                \draw[->] (1) -- (2);
+                \draw[->] (2) -- (3);
+                \draw[->] (2) -- (4);
+                \draw[->] (4) -- (5);
+                \draw[->] (4) -- (6);
+                \draw[->] (4) -- (7);
+                \draw[->] (6) -- (3);
+                \draw[->] (5) -- (8);
+                \draw[->] (7) -- (8);
+            \end{tikzpicture}
+            \caption{A Control Flow Graph}
+        \end{subfigure}
+        \caption{Example of a CFG}
+    \end{figure}
+\end{itemize}
+
+\subsection{Data Flow in Graphs}
+\begin{itemize}
+    \item Graph models of programs can be tested adequately by including values of variables(data values) as a part of the model.
+    \item Data values are created at some point in the program and use later. They can be used several times.
+    \item A \textbf{definition (def)} is a location where a value of a variable is stored into memory.
+    \item A \textbf{use} is a location where a value of a variable is accessed.
+    \item As a program executes, data values are carried from their defs to uses. We call these du-pairs or def-use pairs.
+    \item A \textbf{du-pair} is a pair of location ($l_i,l_j$) such that a variable $v$ is defined at $l_i$ and used at $l_j$.
+    \item Let $V$ be the set of variables that are associated with the program artifact being modelled as a graph.\\
+    The subset of $V$ that each node $n$ (edge $e$) defines is called $def(n)(def(e))$.\\
+    The subset of $V$ that each node $n$ (edge $e$) uses is called $use(n)(use(e))$.
+    \item A def of a variable may or may not reach a particular use.
+    \item A path from $l_i$ to $l_j$ is \textbf{def-clear} with respect to variable $v$ if $v$ is not given another value on any of the nodes or edges in the path.
+    \item If there is a def-clear path from $l_i$ to $l_j$ with respect to $v$, the def of $v$ at $l_i$ \textbf{reaches} the use at $l_j$.
+    \item A \textbf{du-path} with respect to a variable $v$ is a simple path that is def-clear from a def of $v$ to a use of $v$.
+    \item $du(n_i,n_j,v)$: The set of du-paths from $n_i$ to $n_j$ for variable $v$.
+    \item $du(n_i,v)$: The set of du-paths that start at $n_i$ for variable $v$.
+    \item In testing literature, there are two notions of uses available.\\
+    If $v$ is used in a computational or output statement, the use is referred to as \textbf{computation use} (or \textbf{c-use}).\\
+    If $v$ is used in a conditional statement, its use is called as \textbf{predicate use} (or \textbf{p-use}).
+    \item Data flow coverage criteria will be defined as sets of du-paths. Such du-paths will be grouped to define the data flow coverage criteria.
+    \item The \textbf{def-path set} $du(n_i,v)$ is the set of du-paths with respect to variable $v$ that start at node $n_i$.
+    \item A \textbf{def-pair set}, $du(n_i,n_j,v)$ is the set of du-paths with respect to variable $v$ that start at node $n_i$ and end at node $n_j$.
+    \item It can be clearly seen that $du(n_i,v)=\bigcup_{n_j}du(n_i,n_j,v)$.
+    \item A test path $p$ is said to \textbf{du tour} a sub-path $d$ with respect to $v$ if $p$ tours $d$ and the portion of $p$ to which $d$ corresponds is def-clear with respect to $v$.
+    \item We can allow \textbf{def-clear side trips} with respect to $v$ while touring a du-path, if needed.
+    \item There are three common data flow criteria
+    \begin{enumerate}
+        \item TR: Each def reaches at least one use.\label{enum:ST-data-flow-1}
+        \item TR: Each def reaches all possible uses.\label{enum:ST-data-flow-2}
+        \item TR: Each def reaches all possible uses through all possible du-paths.\label{enum:ST-data-flow-3}
+    \end{enumerate}
+    \item We assume every use is preceded by a def, every def reaches at least one use, and for every node with multiple out-going edges, at least one variable is used on each out edge, and the same variables are used on each out edge.
+    \item\textbf{Subsumption}: \textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-3}}}$\rightarrow$\textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-2}}}$\rightarrow$\textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-1}}}
+    \item Prime path coverage subsumes all-du-paths coverage
+\end{itemize}
+
+\end{document}
