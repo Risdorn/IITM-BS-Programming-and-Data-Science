@@ -1,0 +1,10 @@
+Can use any framework, not restricted to Vue :D
+Peer evaluation after milestone 3 and 6
+After milestone 6, presentation that carries 10M
+Presentation: Working of the system, main features of the system, give demo of the system
+Need to make frontend before milestone 3 deadline
+
+Milestone 1: Requirement Gathering and User Stories
+Milestone 2: Storyboard
+Milestone 3: Wireframe
+Milestone 4-6: Roughly includes entire backend
