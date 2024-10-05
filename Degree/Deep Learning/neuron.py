@@ -99,18 +99,22 @@ class sigmoidNeuron():
     The model is defined by a list of weights and a bias.
     Uses gradient descent to fit the model.
     """
-    def __init__(self, inputs=2):
-        self.weights = np.random.rand(inputs)
-        self.weights = self.weights * 2 - 1
-        self.bias = np.random.rand()
-        self.bias = self.bias * 2 - 1
+    def __init__(self, inputs=2, weights = None, bias = None):
+        if weights is not None:
+            self.weights = weights
+        else:
+            self.weights = np.random.rand(inputs)
+            self.weights = self.weights * 2 - 1
+        if bias is not None:
+            self.bias = bias
+        else:
+            self.bias = np.random.rand()
+            self.bias = self.bias * 2 - 1
     
     def model(self, x):
         result = sum([x[i]*self.weights[i] for i in range(len(x))]) + self.bias
-        return self.sigmoid(result)
-    
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+        result = 1 / (1 + np.exp(-result))
+        return result
     
     def sigmoidDerivative(self, x, y):
         constant = (self.model(x) - y) * self.model(x) * (1 - self.model(x))
@@ -132,12 +136,15 @@ class sigmoidNeuron():
     
     def fit(self, X, Y, epochs=100, lr=0.1, printAt=10):
         for i in range(epochs):
+            print(self.weights, self.bias)
             loss = self.loss(X, Y)
             if i%printAt == 0: print("Epoch:", i, "Loss:", loss)
+            print(self.predict(X))
             for j in range(len(Y)):
                 weightD, biasD = self.sigmoidDerivative(X[j], Y[j])
                 self.weights -= np.multiply(lr, weightD)
                 self.bias -= np.multiply(lr, biasD)
+        print(self.weights, self.bias)
 
 
 def mpNeuronTest():
@@ -193,18 +200,33 @@ def sigmoidTest():
     But it gives about 50% probability for all inputs in case of non linearly separable functions.
     This is very interesting.
     """
+    '''
+    Uncomment this for testing
     X = [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]]
     Y = [1, 1, 1, 0, 1, 1, 0, 1]
     sigmoid = sigmoidNeuron(inputs=3)
     sigmoid.fit(X, Y, epochs=1000, lr = 0.05, printAt=100)
     for i in range(len(X)):
         print(X[i], sigmoid.model(X[i]))
+    '''
+    # This is assignment 2 test
+    X = [[-1], [0.2]]
+    Y = [0.5, 0.97]
+    weights = [[[2], [1.9], [1.19], [0.39]], [[2], [2.008], [2.19], [2.39]], [[2], [2.008], [2.19], [2.39]], [[2], [-2.008], [-2.19], [-2.39]]]
+    bias = [[2, 2.04,2.20,2.31], [2, 2.04,2.20,2.31], [2, 1.9,1.19,0.39], [2, 1.9,1.19,0.39]]
+    for i in range(4):
+        print("Run", i+1)
+        for j in range(4):
+            sigmoid = sigmoidNeuron(inputs=1, weights=weights[i][j], bias=bias[i][j])
+            loss = sigmoid.loss(X, Y)
+            print("Loss:", j, loss)
 
 def main():
     #mpNeuronTest()
     #perceptronTest()
     #networkTest()
     sigmoidTest()
+    
 
 if __name__ == '__main__':
     main()

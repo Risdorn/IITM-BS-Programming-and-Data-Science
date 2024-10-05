@@ -1,0 +1,256 @@
+Depth First Search
+Choice: S
+Parent: None
+Open: [('A', 'S'), ('C', 'S')]
+Closed: [('S', None)]
+Choice: A
+Parent: S
+Open: [('B', 'A'), ('C', 'S')]
+Closed: [('A', 'S'), ('S', None)]
+Choice: B
+Parent: A
+Open: [('D', 'B'), ('E', 'B'), ('C', 'S')]
+Closed: [('B', 'A'), ('A', 'S'), ('S', None)]
+Choice: D
+Parent: B
+Open: [('G', 'D'), ('E', 'B'), ('C', 'S')]
+Closed: [('D', 'B'), ('B', 'A'), ('A', 'S'), ('S', None)]
+Choice: G
+Parent: D
+Result path: ['S', 'A', 'B', 'D', 'G']
+
+Breadth First Search
+Choice: S
+Parent: None
+Open: [('A', 'S'), ('C', 'S')]
+Closed: [('S', None)]
+Choice: A
+Parent: S
+Open: [('C', 'S'), ('B', 'A')]
+Closed: [('A', 'S'), ('S', None)]
+Choice: C
+Parent: S
+Open: [('B', 'A'), ('D', 'C')]
+Closed: [('C', 'S'), ('A', 'S'), ('S', None)]
+Choice: B
+Parent: A
+Open: [('D', 'C'), ('E', 'B')]
+Closed: [('B', 'A'), ('C', 'S'), ('A', 'S'), ('S', None)]
+Choice: D
+Parent: C
+Open: [('E', 'B'), ('G', 'D')]
+Closed: [('D', 'C'), ('B', 'A'), ('C', 'S'), ('A', 'S'), ('S', None)]
+Choice: E
+Parent: B
+Open: [('G', 'D')]
+Closed: [('E', 'B'), ('D', 'C'), ('B', 'A'), ('C', 'S'), ('A', 'S'), ('S', None)]
+Choice: G
+Parent: D
+Result path: ['S', 'C', 'D', 'G']
+
+Iterative Deepening Search - N
+Starting with depth bound: 0
+Choice: S Depth: 0
+Parent: None
+Open: []
+Closed: [('S', None, 0)]
+Starting with depth bound: 1
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: []
+Closed: [('C', 'S', 1), ('A', 'S', 1), ('S', None, 0)]
+Starting with depth bound: 2
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('B', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 2
+Parent: A
+Open: [('C', 'S', 1)]
+Closed: [('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: [('D', 'C', 2)]
+Closed: [('C', 'S', 1), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 2
+Parent: C
+Open: []
+Closed: [('D', 'C', 2), ('C', 'S', 1), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Starting with depth bound: 3
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('B', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 2
+Parent: A
+Open: [('D', 'B', 3), ('E', 'B', 3), ('C', 'S', 1)]
+Closed: [('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 3
+Parent: B
+Open: [('E', 'B', 3), ('C', 'S', 1)]
+Closed: [('D', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: E Depth: 3
+Parent: B
+Open: [('C', 'S', 1)]
+Closed: [('E', 'B', 3), ('D', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: []
+Closed: [('C', 'S', 1), ('E', 'B', 3), ('D', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Starting with depth bound: 4
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('B', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 2
+Parent: A
+Open: [('D', 'B', 3), ('E', 'B', 3), ('C', 'S', 1)]
+Closed: [('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 3
+Parent: B
+Open: [('G', 'D', 4), ('E', 'B', 3), ('C', 'S', 1)]
+Closed: [('D', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: G Depth: 4
+Parent: D
+Result path: ['S', 'A', 'B', 'D', 'G']
+
+Iterative Deepening Search - C
+Starting with depth bound: 0
+Choice: S Depth: 0
+Parent: None
+Open: []
+Closed: [('S', None, 0)]
+Starting with depth bound: 1
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: []
+Closed: [('C', 'S', 1), ('A', 'S', 1), ('S', None, 0)]
+Starting with depth bound: 2
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('B', 'A', 2), ('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 2
+Parent: A
+Open: [('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: S Depth: 2
+Parent: A
+Open: [('C', 'S', 1)]
+Closed: [('S', 'A', 2), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: [('A', 'C', 2), ('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('C', 'S', 1), ('S', 'A', 2), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: A Depth: 2
+Parent: C
+Open: [('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('A', 'C', 2), ('C', 'S', 1), ('S', 'A', 2), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 2
+Parent: C
+Open: [('S', 'C', 2)]
+Closed: [('D', 'C', 2), ('A', 'C', 2), ('C', 'S', 1), ('S', 'A', 2), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: S Depth: 2
+Parent: C
+Open: []
+Closed: [('S', 'C', 2), ('D', 'C', 2), ('A', 'C', 2), ('C', 'S', 1), ('S', 'A', 2), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Starting with depth bound: 3
+Choice: S Depth: 0
+Parent: None
+Open: [('A', 'S', 1), ('C', 'S', 1)]
+Closed: [('S', None, 0)]
+Choice: A Depth: 1
+Parent: S
+Open: [('B', 'A', 2), ('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 2
+Parent: A
+Open: [('A', 'B', 3), ('D', 'B', 3), ('E', 'B', 3), ('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: A Depth: 3
+Parent: B
+Open: [('D', 'B', 3), ('E', 'B', 3), ('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 3
+Parent: B
+Open: [('E', 'B', 3), ('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: E Depth: 3
+Parent: B
+Open: [('S', 'A', 2), ('C', 'S', 1)]
+Closed: [('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: S Depth: 2
+Parent: A
+Open: [('A', 'S', 3), ('C', 'S', 1)]
+Closed: [('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: A Depth: 3
+Parent: S
+Open: [('C', 'S', 1)]
+Closed: [('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 1
+Parent: S
+Open: [('A', 'C', 2), ('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: A Depth: 2
+Parent: C
+Open: [('B', 'A', 3), ('C', 'A', 3), ('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 3
+Parent: A
+Open: [('C', 'A', 3), ('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 3
+Parent: A
+Open: [('D', 'C', 2), ('S', 'C', 2)]
+Closed: [('C', 'A', 3), ('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: D Depth: 2
+Parent: C
+Open: [('B', 'D', 3), ('C', 'D', 3), ('E', 'D', 3), ('G', 'D', 3), ('S', 'C', 2)]
+Closed: [('D', 'C', 2), ('C', 'A', 3), ('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: B Depth: 3
+Parent: D
+Open: [('C', 'D', 3), ('E', 'D', 3), ('G', 'D', 3), ('S', 'C', 2)]
+Closed: [('B', 'D', 3), ('D', 'C', 2), ('C', 'A', 3), ('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: C Depth: 3
+Parent: D
+Open: [('E', 'D', 3), ('G', 'D', 3), ('S', 'C', 2)]
+Closed: [('C', 'D', 3), ('B', 'D', 3), ('D', 'C', 2), ('C', 'A', 3), ('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: E Depth: 3
+Parent: D
+Open: [('G', 'D', 3), ('S', 'C', 2)]
+Closed: [('E', 'D', 3), ('C', 'D', 3), ('B', 'D', 3), ('D', 'C', 2), ('C', 'A', 3), ('B', 'A', 3), ('A', 'C', 2), ('C', 'S', 1), ('A', 'S', 3), ('S', 'A', 2), ('E', 'B', 3), ('D', 'B', 3), ('A', 'B', 3), ('B', 'A', 2), ('A', 'S', 1), ('S', None, 0)]
+Choice: G Depth: 3
+Parent: D
+Result path: ['S', 'C', 'D', 'G']
