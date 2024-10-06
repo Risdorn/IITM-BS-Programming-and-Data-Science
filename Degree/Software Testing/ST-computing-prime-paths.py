@@ -38,6 +38,8 @@ def computePrime(Loops, Terminate, Detour, finalVertices):
         if path[0] == 0 and path[-1] in finalVertices:
             complete.append(path)
     # For each path, check if there is a loop or detour that can be inserted
+    primes = []
+    primes.extend(complete)
     for j, path in enumerate(complete):
         store_detour = []
         store = []
@@ -48,22 +50,25 @@ def computePrime(Loops, Terminate, Detour, finalVertices):
             for loop in Loops:
                 if path[i] == loop[0]:
                     store.append([i, loop])
-        additive = 0
         for i, loop in store_detour:
-            suffix = complete[j][i+2+additive:]
-            complete[j] = complete[j][:i+additive]
-            complete[j].extend(loop)
-            complete[j].extend(suffix)
-            additive += len(loop) - 2
+            suffix = complete[j][i+2:]
+            newPath = complete[j][:i]
+            newPath.extend(loop)
+            newPath.extend(suffix)
+            primes.append(newPath)
         for i, loop in store:
-            suffix = complete[j][i+1+additive:]
-            complete[j] = complete[j][:i+additive]
-            complete[j].extend(loop)
-            complete[j].extend(suffix)
-            additive += len(loop) - 1
-    return complete
+            suffix = complete[j][i+1:]
+            newPath = complete[j][:i]
+            newPath.extend(loop)
+            newPath.extend(suffix)
+            primes.append(newPath)
+    # Remove duplicates
+    primes = [list(x) for x in set(tuple(x) for x in primes)]
+    return primes
 
-G = [[1,4], [2,5], [3], [1], [4,6], [6], []]
+#G = [[1,4], [2,5], [3], [1], [4,6], [6], []]
+#G = [[1], [2,5], [3,4], [4], [1], []]
+G = [[1], [2,3], [6], [4,5], [3], [6], []]
 Prime, Loops, Terminate, Detour = computingPrimePath(G, [6])
 print("Prime Paths:")
 for path in Prime:
