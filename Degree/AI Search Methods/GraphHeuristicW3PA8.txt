@@ -1,0 +1,67 @@
+MoveGen of B: ['A', 'C', 'D', 'E', 'H']
+Manhattan Distance from S to G: 95
+Manhattan Distance from A to G: 65
+Manhattan Distance from B to G: 75
+Manhattan Distance from C to G: 100
+Manhattan Distance from D to G: 55
+Manhattan Distance from E to G: 85
+Manhattan Distance from F to G: 35
+Manhattan Distance from H to G: 60
+Manhattan Distance from I to G: 80
+Manhattan Distance from J to G: 65
+Manhattan Distance from K to G: 40
+Manhattan Distance from L to G: 25
+Manhattan Distance from M to G: 60
+Manhattan Distance from N to G: 20
+Manhattan Distance from O to G: 30
+Manhattan Distance from P to G: 50
+Manhattan Distance from Q to G: 70
+Manhattan Distance from R to G: 90
+Manhattan Distance from G to G: 0
+Hill Climbing Search with graphHeuristic:
+Iteration: 1 Node: S Heuristic: 95
+Iteration: 2 Node: M Heuristic: 60
+Iteration: 3 Node: P Heuristic: 50
+Iteration: 4 Node: M Heuristic: 60
+Best Node: P
+
+Best First Search with graphHeuristic:
+Choice: S
+Parent: None
+Open: [('M', 'S', 60), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('S', None, 95)]
+Choice: M
+Parent: S
+Open: [('P', 'M', 50), ('J', 'M', 65), ('Q', 'M', 70), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('M', 'S', 60), ('S', None, 95)]
+Choice: P
+Parent: M
+Open: [('J', 'M', 65), ('Q', 'M', 70), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: J
+Parent: M
+Open: [('H', 'J', 60), ('Q', 'M', 70), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: H
+Parent: J
+Open: [('K', 'H', 40), ('D', 'H', 55), ('Q', 'M', 70), ('B', 'H', 75), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('H', 'J', 60), ('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: K
+Parent: H
+Open: [('L', 'K', 25), ('O', 'K', 30), ('D', 'H', 55), ('Q', 'M', 70), ('B', 'H', 75), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('K', 'H', 40), ('H', 'J', 60), ('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: L
+Parent: K
+Open: [('O', 'K', 30), ('F', 'L', 35), ('D', 'H', 55), ('Q', 'M', 70), ('B', 'H', 75), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('L', 'K', 25), ('K', 'H', 40), ('H', 'J', 60), ('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: O
+Parent: K
+Open: [('N', 'O', 20), ('F', 'L', 35), ('D', 'H', 55), ('Q', 'M', 70), ('B', 'H', 75), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('O', 'K', 30), ('L', 'K', 25), ('K', 'H', 40), ('H', 'J', 60), ('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: N
+Parent: O
+Open: [('G', 'N', 0), ('F', 'L', 35), ('D', 'H', 55), ('Q', 'M', 70), ('B', 'H', 75), ('I', 'S', 80), ('E', 'S', 85), ('C', 'S', 100)]
+Closed: [('N', 'O', 20), ('O', 'K', 30), ('L', 'K', 25), ('K', 'H', 40), ('H', 'J', 60), ('J', 'M', 65), ('P', 'M', 50), ('M', 'S', 60), ('S', None, 95)]
+Choice: G
+Parent: N
+Path: ['S', 'M', 'J', 'H', 'K', 'O', 'N', 'G']

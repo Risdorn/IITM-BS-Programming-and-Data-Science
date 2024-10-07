@@ -4,18 +4,34 @@ class EightTiles:
         self.goal = goal
     
     def heuristic1(self, state):
+        """Heuristic 1
+        
+        This function calculates the number of misplaced tiles except 0 in the current state.
+        """
         # Number of misplace tiles except 0
         return sum([1 for i in range(9) if state[i] != self.goal[i] and state[i] != 0])
 
     def heuristic2(self, state):
+        """Heuristic 2
+        
+        This function calculates the Manhattan distance of each tile except 0 in the current state.
+        """
         # Manhattan distance except 0
         return sum([abs(i % 3 - self.goal.index(state[i]) % 3) + abs(i // 3 - self.goal.index(state[i]) // 3) for i in range(9) if state[i] != 0])
     
     def heuristic3(self, state):
+        """Heuristic 3
+        
+        This function calculates the number of correctly placed tiles except 0 in the current state.
+        """
         # Number of correctly placed tiles except 0
         return sum([1 for i in range(9) if state[i] == self.goal[i] and state[i] != 0])
     
     def heuristic4(self, state):
+        """Heuristic 4
+        
+        This function calculates the number of correctly minus misplaced tiles except 0 in the current state.
+        """
         # h3 - h1
         return self.heuristic3(state) - self.heuristic1(state)
     
@@ -28,6 +44,10 @@ class EightTiles:
         if i // 3 > 0: moves.append(state[:i-3] + [0] + state[i-2:i] + [state[i-3]] + state[i+1:])
         if i // 3 < 2: moves.append(state[:i] + [state[i+3]] + state[i+1:i+3] + [0] + state[i+4:])
         return moves
+    
+    def GoalTest(self, state):
+        # Check if the current state is the goal state
+        return state == self.goal
 
 def eightTilesTest():
     goal = [1,2,3,8,0,4,7,6,5]
@@ -73,6 +93,10 @@ class BlockTower:
                     return i, j
     
     def heuristic1(self, state):
+        """Heuristic 1
+        
+        Add 1 if a block is on the correct block/table, otherwise, subtract 1.
+        """
         # add 1, if a block is on the correct block/table, otherwise, subtract 1.
         total = 0
         for i in range(len(state)):
@@ -90,6 +114,10 @@ class BlockTower:
                     
 
     def heuristic2(self, state):
+        """Heuristic 2
+        
+        Add n if a block is on the correct block/table, otherwise, subtract n, where n is the level of the block.
+        """
         # for a block at level n, add n if the block rests on the correct structure below it, otherwise, subtract n.
         total = 0
         for i in range(len(state)):
@@ -105,6 +133,10 @@ class BlockTower:
         return total
 
     def heuristic3(self, state):
+        """Heuristic 3
+        
+        Number of misplaced blocks, blocks not in final position.
+        """
         # number of misplaced blocks, blocks not in final position.
         total = 0
         for i in range(len(state)):
@@ -120,6 +152,10 @@ class BlockTower:
         return total
     
     def heuristic4(self, state):
+        """Heuristic 4
+        
+        Number of correctly placed blocks, blocks in final position.
+        """
         # number of correctly placed blocks, blocks in final position. 
         total = 0
         for i in range(len(state)):
@@ -129,11 +165,38 @@ class BlockTower:
                 if j >= m: break
                 if state[i][j] == self.goal[i][j]: total += 1
         return total
+    
+    def deepCopy(self, state):
+        # Deep copy of the state
+        newState = []
+        for i in range(len(state)):
+            newState.append(state[i].copy())
+        return newState
+    
+    def MoveGen(self, state):
+        # This will return new states that can be reached from the current state
+        moves = []
+        for i in range(len(state)):
+            newState = self.deepCopy(state)
+            if len(newState[i]) == 0: continue
+            block = newState[i].pop()
+            for j in range(len(newState)):
+                if i == j: continue
+                newState2 = self.deepCopy(newState)
+                newState2[j].append(block)
+                moves.append(newState2)
+        return moves
+    
+    def GoalTest(self, state):
+        # Check if the current state is the goal state
+        return state == self.goal
 
 def BlockTowerTest():
     goal = [["D","C","B","E","A"], ["F"], []]
     start = [["D","C","B","A"], ["F", "E"], []]
     blockTower = BlockTower(start, goal)
+    print("Moves from Start:")
+    print(blockTower.MoveGen(start))
     P = [["D","C","B"], ["F", "E"], ["A"]]
     Q = [["D","C","B"], ["F","E","A"], []]
     R = [["D","C","B","A","E"], ["F"], []]

@@ -18,11 +18,13 @@ class TravellingSalesman:
         # State is city
         neighbors = self.graph[state]
         nearest = max(neighbors)
+        index = -1
         for i in range(len(neighbors)):
             if neighbors[i] < nearest and i != state and i not in visited:
                 nearest = neighbors[i]
+                index = i
         
-        return neighbors.index(nearest)
+        return index
     
     def computeTour(self):
         # Compute the tour using nearest neighbor algorithm

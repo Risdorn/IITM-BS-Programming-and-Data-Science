@@ -1,0 +1,140 @@
+Manhattan Distance from S to G: 130
+Manhattan Distance from A to G: 130
+Manhattan Distance from B to G: 160
+Manhattan Distance from C to G: 90
+Manhattan Distance from D to G: 50
+Manhattan Distance from E to G: 120
+Manhattan Distance from F to G: 80
+Manhattan Distance from H to G: 50
+Manhattan Distance from I to G: 80
+Manhattan Distance from J to G: 110
+Manhattan Distance from K to G: 60
+Manhattan Distance from L to G: 40
+Manhattan Distance from M to G: 40
+Manhattan Distance from N to G: 100
+Manhattan Distance from O to G: 160
+Manhattan Distance from P to G: 50
+Manhattan Distance from G to G: 0
+
+Breadth First Search:
+Choice: S
+Parent: None
+Open: [('B', 'S'), ('E', 'S'), ('J', 'S'), ('O', 'S')]
+Closed: [('S', None)]
+Choice: B
+Parent: S
+Open: [('E', 'S'), ('J', 'S'), ('O', 'S'), ('A', 'B')]
+Closed: [('B', 'S'), ('S', None)]
+Choice: E
+Parent: S
+Open: [('J', 'S'), ('O', 'S'), ('A', 'B'), ('F', 'E'), ('I', 'E')]
+Closed: [('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: J
+Parent: S
+Open: [('O', 'S'), ('A', 'B'), ('F', 'E'), ('I', 'E')]
+Closed: [('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: O
+Parent: S
+Open: [('A', 'B'), ('F', 'E'), ('I', 'E')]
+Closed: [('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: A
+Parent: B
+Open: [('F', 'E'), ('I', 'E'), ('C', 'A')]
+Closed: [('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: F
+Parent: E
+Open: [('I', 'E'), ('C', 'A'), ('K', 'F')]
+Closed: [('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: I
+Parent: E
+Open: [('C', 'A'), ('K', 'F')]
+Closed: [('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: C
+Parent: A
+Open: [('K', 'F'), ('D', 'C')]
+Closed: [('C', 'A'), ('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: K
+Parent: F
+Open: [('D', 'C'), ('M', 'K'), ('N', 'K')]
+Closed: [('K', 'F'), ('C', 'A'), ('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: D
+Parent: C
+Open: [('M', 'K'), ('N', 'K'), ('G', 'D'), ('H', 'D')]
+Closed: [('D', 'C'), ('K', 'F'), ('C', 'A'), ('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: M
+Parent: K
+Open: [('N', 'K'), ('G', 'D'), ('H', 'D'), ('P', 'M')]
+Closed: [('M', 'K'), ('D', 'C'), ('K', 'F'), ('C', 'A'), ('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: N
+Parent: K
+Open: [('G', 'D'), ('H', 'D'), ('P', 'M')]
+Closed: [('N', 'K'), ('M', 'K'), ('D', 'C'), ('K', 'F'), ('C', 'A'), ('I', 'E'), ('F', 'E'), ('A', 'B'), ('O', 'S'), ('J', 'S'), ('E', 'S'), ('B', 'S'), ('S', None)]
+Choice: G
+Parent: D
+Path: ['S', 'B', 'A', 'C', 'D', 'G']
+
+Best First Search with graphHeuristic:
+Choice: S
+Parent: None
+Open: [('J', 'S', 110), ('E', 'S', 120), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('S', None, 130)]
+Choice: J
+Parent: S
+Open: [('I', 'J', 80), ('E', 'S', 120), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('J', 'S', 110), ('S', None, 130)]
+Choice: I
+Parent: J
+Open: [('E', 'S', 120), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('I', 'J', 80), ('J', 'S', 110), ('S', None, 130)]
+Choice: E
+Parent: S
+Open: [('F', 'E', 80), ('A', 'E', 130), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('E', 'S', 120), ('I', 'J', 80), ('J', 'S', 110), ('S', None, 130)]
+Choice: F
+Parent: E
+Open: [('K', 'F', 60), ('C', 'F', 90), ('A', 'E', 130), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('F', 'E', 80), ('E', 'S', 120), ('I', 'J', 80), ('J', 'S', 110), ('S', None, 130)]
+Choice: K
+Parent: F
+Open: [('M', 'K', 40), ('C', 'F', 90), ('N', 'K', 100), ('A', 'E', 130), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('K', 'F', 60), ('F', 'E', 80), ('E', 'S', 120), ('I', 'J', 80), ('J', 'S', 110), ('S', None, 130)]
+Choice: M
+Parent: K
+Open: [('G', 'M', 0), ('P', 'M', 50), ('C', 'F', 90), ('N', 'K', 100), ('A', 'E', 130), ('B', 'S', 160), ('O', 'S', 160)]
+Closed: [('M', 'K', 40), ('K', 'F', 60), ('F', 'E', 80), ('E', 'S', 120), ('I', 'J', 80), ('J', 'S', 110), ('S', None, 130)]
+Choice: G
+Parent: M
+Path: ['S', 'E', 'F', 'K', 'M', 'G']
+
+Hill Climbing Search with graphHeuristic:
+Iteration: 1 Node: S Heuristic: 130
+Iteration: 2 Node: J Heuristic: 110
+Iteration: 3 Node: I Heuristic: 80
+Iteration: 4 Node: J Heuristic: 110
+Best Node: I
+
+Best Neighbor Descent with graphHeuristic:
+Iteration: 1 Node: S Heuristic: 130
+Iteration: 2 Node: J Heuristic: 110
+Iteration: 3 Node: I Heuristic: 80
+Iteration: 4 Node: J Heuristic: 110
+Iteration: 5 Node: I Heuristic: 80
+Iteration: 6 Node: J Heuristic: 110
+Iteration: 7 Node: I Heuristic: 80
+Iteration: 8 Node: J Heuristic: 110
+Iteration: 9 Node: I Heuristic: 80
+Iteration: 10 Node: J Heuristic: 110
+Iteration: 11 Node: I Heuristic: 80
+Iteration: 12 Node: J Heuristic: 110
+Iteration: 13 Node: I Heuristic: 80
+Iteration: 14 Node: J Heuristic: 110
+Iteration: 15 Node: I Heuristic: 80
+Iteration: 16 Node: J Heuristic: 110
+Iteration: 17 Node: I Heuristic: 80
+Iteration: 18 Node: J Heuristic: 110
+Best Node: I
+
+Traveling Salesman Problem:
+Nearest Neighbor Tour: ['S', 'J', 'I', 'F', 'E', 'B', 'A', 'C', 'D', 'G', 'M', 'K', 'N', 'O', 'P', 'L', 'H', 'S'] Cost: 781.6476157417384
+Savings Tour: ['S', 'E', 'I', 'F', 'C', 'D', 'H', 'L', 'G', 'P', 'M', 'K', 'N', 'O', 'J', 'B', 'S'] Cost: 640.1310640815881
+Greedy Tour: ['H', 'L', 'P', 'O', 'N', 'K', 'M', 'G', 'D', 'C', 'A', 'B', 'E', 'F', 'I', 'J', 'S', 'H'] Cost: 781.6476157417384
