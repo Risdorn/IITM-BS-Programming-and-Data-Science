@@ -250,7 +250,7 @@ def main():
     edges = {'S': ['A', 'C'], 'A': ['B', 'C', 'S'], 'B': ['A', 'D', 'E'], 'C': ['A', 'D', 'S'], 'D': ['B','C','E','G'], 'E': ['B','D','G'], 'G': ['D','E']}
     G = graph(nodes, edges, start, goal)
     
-    with open("Degree/AI Search Methods/GraphSearch.txt", "w") as f:
+    with open("Degree/AI Search Methods/graphSearch/GraphSearch.txt", "w") as f:
         sys.stdout = f
         print("Depth First Search")
         path = DepthFirstSearch(G.start, G.MoveGen, G.GoalTest)

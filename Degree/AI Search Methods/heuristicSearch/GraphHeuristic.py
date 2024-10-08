@@ -1,6 +1,6 @@
-from GeneralSearch import graph
+from ..graphSearch.GeneralSearch import graph
 from HeuristicSearch import BestFirstSearch, HillClimbing, BeamSearch, BestNeighborDescent
-from GraphSearch import BreadthFirstSearch
+from ..graphSearch.GraphSearch import BreadthFirstSearch
 from TravellingSalesman import TravellingSalesman
 import sys
 
@@ -61,7 +61,7 @@ def main():
     start = "S"
     goal = "G"
     GH = graphHeuristic(nodes, edges, coordinates, start, goal)
-    with open("Degree/AI Search Methods/GraphHeuristicW3PA8.txt", "w") as file:
+    with open("Degree/AI Search Methods/heuristicSearch/GraphHeuristicW3PA8.txt", "w") as file:
         sys.stdout = file
         print("MoveGen of B:", GH.MoveGen("B"))
         for node in nodes:
@@ -95,7 +95,7 @@ def main():
             if i == j: continue
             graph[i][j] = GH.euclideanDistance(nodes[i], nodes[j])
     TSP = TravellingSalesman(graph, 0, keys)
-    with open("Degree/AI Search Methods/GraphHeuristicW3GA.txt", "w") as file:
+    with open("Degree/AI Search Methods/heuristicSearch/GraphHeuristicW3GA.txt", "w") as file:
         sys.stdout = file
         for node in nodes:
             print("Manhattan Distance from", node, "to G:", GH.manhattanDistance(node))
