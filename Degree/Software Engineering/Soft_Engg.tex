@@ -2,11 +2,6 @@
 \input{head}
 \usepackage{pdfpages}
 
-\newlength{\originalVOffset}
-\newlength{\originalHOffset}
-\setlength{\originalVOffset}{\voffset}   
-\setlength{\originalHOffset}{\hoffset}
-
 \begin{document}
 
 \fancyhead[c]{}
@@ -240,8 +235,8 @@ Software Engineering
         \item \textbf{Sequence}: What steps are involved? What leads someone to use the app? What task is being illustrated?
         \item \textbf{Satisfaction}: What motivates people to use the system? What does it enable people to accomplish? What need does the system fill?
     \end{enumerate}
-    \item \textbf{Benefits of Storyboard}: Emphasizes how interface accomplishes a task. Avoids commitment to a particular user interface. Shared understanding among stakeholders.
-    \item \textbf{Paper Prototypes}: Hand-drawn interface on multiple pieces of paper.
+    \item \textbf{Benefits of Storyboard}: Emphasizes how interface accomplishes a task. Avoids commitment to a particular user interface. Shared understanding among stakeholders. Some resources \href{https://www.youtube.com/watch?v=JMjozqJS44M}{video-1} and \href{https://www.youtube.com/watch?v=6dre0P4tRTc}{video-2}.
+    \item \textbf{Paper Prototypes}: Hand-drawn interface on multiple pieces of paper. 
     \item \textbf{Benefits of Paper Prototypes}: Easier than writing code for user interface. Starts conversation about user interactions. Elements can be changed immediately based on given feedback.
     \item \textbf{Digital Mock-ups}: Using stuff like photoshop, PowerPoint, transform a paper prototype into a digital mockup.
     \begin{figure}[H]
@@ -286,13 +281,125 @@ Software Engineering
         \item \textbf{Support Error Recovery}: Make the problem clear. Provide a solution. Provide an alternate.
         \item \textbf{Provide Help}: Ensure help is easy to search. Provide help in context
     \end{enumerate}
-    \item Experts evaluate the prototype, i.e., Do multiple passes and provide a list of issues that violate design heuristics.
+    \item Experts evaluate the prototype, i.e., do multiple passes and provide a list of issues that violate design heuristics.
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.5\linewidth]{Degree//static/SE_heuristic_summary.png}
         \caption{Design Heuristics Summary}
         \label{fig:ST-design-heuristic-summary}
     \end{figure}
+    \item Importance of \href{https://www.vox.com/first-person/2017/3/1/14777110/typography-oscars-2017}{typography}.
 \end{itemize}
+
+\section{Project Estimation Techniques}
+\subsection{Introduction}
+\begin{itemize}
+    \item \textbf{Importance of Estimation}: Establishing cost and Schedule. From a Client's perspective cost and schedule must be provided to them.
+    \item \textbf{Key Estimation Parameters}: Size/Lines of code(KLOC, number of 1000 lines of code), Effort(How many people are required in the team, Person-month, effort an individual can typically put in a month).
+    \item \textbf{Empirical Estimation}: Ask people who have completed similar projects.
+    \item \textbf{Expert Judgment}: They can make an educated guess, but can encounter human errors, individual bias, optimistic estimates, overlook some factors, lack of adequate knowledge. To some extent, this can be averted by having a group of experts.
+    \item \textbf{Delphi Technique}: Coordinator provides multiple Experts the SRS document and a form for recording cost estimates. Experts submit their estimates to the coordinator. Then the coordinator prepares a summary and distributes to all experts. Now, experts look at this summary and re-estimate the cost. This process can be iterated over several rounds.
+    \item \textbf{Heuristic Technique}: Modelled using suitable mathematical expressions.
+    \item \textbf{COCOMO Estimation Model}: Constructive Cost Estimation Model, $Effort=a\times SIZE^b$. $a$ and $b$ depend on the type of project.
+    \item \textbf{Types of Projects}: Organic(Well understood application program, and team size is small and experiences), Semi-detached(Mix of experienced and inexperienced people), Embedded(Strongly couple with hardware).
+    \item For Organic projects $a=2.4$ and $b=1.05$, for semi-detached project $a=3.0$ and $b=1.12$, and for embedded projects $a=3.6$ and $b=1.20$.
+    \item \textbf{Effort Estimation Parameters}: People working on the project, Technical attributes of the project, Tools and practices used by the team.
+    \item In COCOMO model, after getting initial estimates we add \textbf{cost driver attributes}. This would include Reliability, Database sizes, etc.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.40\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/SE_COCOMO_ex.png}
+            \caption{COCOMO model}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.50\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/SE_cost_driver.png}
+            \caption{Cost Drivers}
+        \end{subfigure}
+        \caption{Amazon Seller Portal Example}
+        \label{fig:SE-amazon-seller}
+    \end{figure}
+\end{itemize}
+
+\subsection{Project Scheduling}
+\begin{itemize}
+    \item Helps monitor timely completion of a task, and take corrective action if it falls behind.
+    \item The Schedule can be built in steps as follows
+    \begin{enumerate}
+        \item Identify all major activities,
+        \item Break down each activity into tasks,
+        \item Determine the dependency among different tasks,
+        \item Estimations for time durations required to complete the tasks,
+        \item Represent this information in a chart/graph/network,
+        \item Determine task starting and end dates from the representation,
+        \item Determine the critical path(a chain of tasks that determine the duration of the project),
+        \item Allocate resource to the tasks.
+    \end{enumerate}
+    \item Breakdown of activities can be done using \textbf{Work Breakdown Structure(WBS)}, it will create a tree like structure as follows
+    \begin{enumerate}
+        \item \textbf{Root}: Project name
+        \item Each node is broken down into smaller activities, \textbf{children}
+        \item Each leaf represents a task which can be allocated to a developer and scheduled.
+        \item \textbf{Task}: Each task should take roughly two weeks to develop.
+    \end{enumerate}
+    \item Once we have the breakdown, now we create the activity network.
+    \item \textbf{Activity Network}: Different activities making up a project, estimated durations, interdependencies. Leaf nodes of the WBS become the nodes of the activity network.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/SE_Seller_WBS.png}
+            \caption{Work Breakdown Structure}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/SE_Activity_Network.png}
+            \caption{Activity Network}
+        \end{subfigure}
+        \caption{Seller Portal Example}
+        \label{fig:SE-seller-portal}
+    \end{figure}
+    \item \textbf{Gantt Chart}: Another way to represent Activity network, it is a type of chart.
+\end{itemize}
+
+\subsection{Risk Management}
+\begin{itemize}
+    \item A risk is an anticipated unfavorable event or circumstance that can occur while a project is underway. This can be due to intangible nature of software, conflicts in a team.
+    \item \textbf{Technical Risks}: Due to development team's insufficient knowledge about the product.
+    \item Developing the wrong functions and user interfaces, can be mitigated by communicating with clients and build prototypes.
+    \item Shortcomings in external components, can be mitigated by benchmarking and regular inspections.
+    \item \textbf{Project Risks}: Project risks occur due to problems in budget, schedule, personnel, resources, and customer related problems.
+    \item Most common type is schedule slippage, the project falls behind schedule, can be mitigated by creating detailed milestones, constant iterations, communicate frequently with clients.
+    \item Insufficient domain knowledge/technical knowledge, can be mitigated by hiring developers with relevant experience, or we could outsource to third party vendors.
+    \item Personnel shortfalls, can be mitigated by cross-training, train multiple people with skills required to work on the project.
+    \item \textbf{Business Risks}: Risks which can harm the business aspects of the software product.
+    \item Product is no longer competitive in the market, can be mitigated by exploring the market for similar products.
+    \item Gold plating, developing unnecessary features, can be mitigated by communicating with clients and do cost-benefit analysis.
+    \item \textbf{Risk Assessment}: Project manager asks everyone in the team for worst case scenario and the PM then creates a "risk table".
+    \item Then a probability(P) is assigned to each risk, each risk is also assigned Impact(I), which can negligible, marginal, critical, catastrophic(1-4).
+    \item The risk is then calculated as $Risk=P\times I$, which then is sorted in descending order and decide which risk need to mitigated first.
+\end{itemize}
+
+\subsection{Project Management in Agile}
+\begin{itemize}
+    \item Does not predict cost and schedule at the start of the project.
+    \item \textbf{Team formation}: Usually team size is 4–9 people, and we organize development using \textbf{Scrum}. At the heart of scrum are sprints.
+    \item \textbf{Sprint}: short, time-boxed period when a scrum team works to complete a set amount of work.
+    \item \textbf{Development Team}: Whoever is required to complete work in that given sprint.
+    \item \textbf{Product Owner}: Interfaces between the client and the development team.
+    \item \textbf{Scrum Master}: Ensures all activities are being done well.
+    \item \textbf{Sprint Planning}: This is a collaborative event between product owner, scrum master, and the development team. We ask two basic questions, What work can get done in this sprint? and How will the chosen work get done?. This meeting is roughly 2 hours per week of its iteration.
+    \item \textbf{Product Backlog}: Prioritized list of work for the development team that is derived from user stories and requirements. Prioritizing will be done in sprint planning meetings.
+    \item \textbf{Standup/Daily Scrum Meeting}: Daily meeting which involves everybody. Each member answers three questions, What did I work on yesterday?, What am I working on today?, and What issues are blocking me?
+    \item \textbf{Sprint Review}: After the sprint the team demonstrates what they have completed. Move things from To-Do, In Progress to Done.
+    \item \textbf{Sprint Retrospective}: Evaluate the last sprint, Discuss user stories/tasks that went well/didn't go well, and finally create and implement a plan.
+    \item \textbf{Project Scheduling}: Key indicator of progress is how many user stories are implemented. Project estimation can be simply counting the number of user stories completed per iteration/sprint.
+    \item Not all user stories require the same effort, and hence this can lead to mis-prediction. This is mitigated by assigning points to user stories, and calculate \textbf{velocity} which is the number of points per iteration/sprint.
+    \item One good software to do this is \textbf{Pivotal Tracker}, Link for which can be found \href{https://www.pivotaltracker.com/}{here}.
+\end{itemize}
+
 
 \end{document}

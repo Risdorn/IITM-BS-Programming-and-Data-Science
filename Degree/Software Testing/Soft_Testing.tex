@@ -3,11 +3,6 @@
 \usepackage{pdfpages}
 \usetikzlibrary{positioning}
 
-\newlength{\originalVOffset}
-\newlength{\originalHOffset}
-\setlength{\originalVOffset}{\voffset}   
-\setlength{\originalHOffset}{\hoffset}
-
 \begin{document}
 
 \fancyhead[c]{}
@@ -513,7 +508,140 @@ Software Testing
     \end{enumerate}
     \item We assume every use is preceded by a def, every def reaches at least one use, and for every node with multiple out-going edges, at least one variable is used on each out edge, and the same variables are used on each out edge.
     \item\textbf{Subsumption}: \textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-3}}}$\rightarrow$\textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-2}}}$\rightarrow$\textcircled{\raisebox{-0.9pt}{\ref{enum:ST-data-flow-1}}}
-    \item Prime path coverage subsumes all-du-paths coverage
+    \item Prime path coverage subsumes all-du-paths coverage.
+\end{itemize}
+
+\section{Integration Testing}
+\subsection{Introduction}
+\begin{itemize}
+    \item Software design basically dictates how the software is organized into \textbf{modules}.
+    \item Modules interact with each other using well-defined \textbf{interfaces}.
+    \item \textbf{Integration testing} involves testing if the modules that have been put together as per design meet their functionalities and if the interfaces are correct.
+    \item Begins after unit testing, each module has been unit tested.
+    \item \textbf{Procedure call interface}: A procedure/method in one module calls a procedure/method in another module. Control can be passed in both directions.
+    \item \textbf{Shared memory interface}: A block of memory is shared between two modules. Data is written to/read from the memory block by the modules. The memory block itself can be created by a third module.
+    \item \textbf{Message-passing interface}: One module prepares a message of a particular type and send it to another module through this interface. Client-server systems and web-based systems use such interfaces.
+    \item Empirical studies account for up to quarter of all the errors in a system to be interface errors.
+    \item Integration testing need not wait until all the modules of a system are coded and unit tested.
+    \item When testing incomplete portions of software, we need extra software components, sometimes called \textbf{scaffolding}.
+    \item \textbf{Test stub} is a skeletal or special purpose implementation of a software module, used to develop or test a component that calls the stub or otherwise depends on it.
+    \item \textbf{Test driver} is a software component or test tool that replaces a component that tales care of the control and/or the calling of a software component.
+    \item There are five approaches to do integration testing: Incremental, Top-down, Bottom-up, Sandwich, and Big Bang.
+    \item \textbf{Incremental approach}: Integration testing is conducted in an incremental manner. The complete system is built incrementally, cycle by cycle, until the entire system is operational. Each cycle is tested by integrating the corresponding modules, errors are fixed before the testing of next cycle begins.
+    \item \textbf{Top-down approach to integration testing}: Works well for systems with hierarchical design. 
+    \item In hierarchical design, there is a first top-level module, which is decomposed into some second-level modules, some of which, are in turn, decomposed into third-level modules and so on. Terminal modules are those that are not decomposed and can occur at any level. Module hierarchy is the reference document.
+    \item It could be the case that A and B are ready but C and D are not, so we can develop stubs for C and D for testing interface between A and B. We keep doing this level by level.
+    \item \textbf{Bottom-up approach}: Now we basically start with the lowest level modules and write test drivers to test integration.
+    \item Basic difference between top-down and bottom-up is that top-down uses only test stubs and bottom-up uses test drivers.
+    \item \textbf{Sandwich} approach tests a system by using a mix of top-down and bottom-up testing.
+    \item \textbf{Big Bang Approach}: All individually tested modules are put together to construct the entire system which is tested as a whole.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.3\linewidth]{Degree//static/ST_module_heirarchy.png}
+        \caption{Module Hierarchy}
+        \label{fig:ST-module-heirarchy}
+    \end{figure}
+\end{itemize}
+
+\subsection{Design Integration Testing}
+\begin{itemize}
+    \item Graph models for integration testing are called \textbf{Call graphs}.
+    \item For graph models, nodes now become modules/test stubs/test drivers and edges become interfaces.
+    \item \textbf{Structural coverage criteria}: Deals with calls over interfaces.
+    \item \textbf{Data flow coverage criteria}: Deals with exchange of data over interfaces.
+    \item Node coverage will be to call every module at least once.
+    \item Edge coverage is to execute every call at least once.
+    \item Specified path coverage can be used to test a sequence of method calls.
+    \item Data flow interfaces among modules are more complicated than control flow interfaces.
+    \item \textbf{Caller}: A module that invokes/calls another module.
+    \item \textbf{Callee}: The module that is called.
+    \item \textbf{Call site}: The statement or node where the call appears in the code.
+    \item \textbf{Actual parameters}: Variables in the caller.
+    \item \textbf{Formal parameters}: Variables in the callee.
+    \item \textbf{Coupling variables} are variables that are defined in one unit and used in the other.
+    \item \textbf{Parameter coupling}: Parameters are passed in calls.
+    \item \textbf{Shared data coupling}: Two units access the same data through global or shared variables.
+    \item \textbf{External device coupling}: Two units access an external object like a file.
+    \item \textbf{Message-passing interfaces}: Two units communicate by sending and/or receiving messages over buffers/channels.
+    \item Since focus is on testing interfaces, we consider the \textbf{last definitions} of variables before calls to and returns from the called units and the \textbf{first uses} inside the modules and after calls.
+    \item \textbf{Last-def}: The set of nodes that define a variable $x$ and has a def-clear path from the node through a call site to a use in the other module. Can be in either direction.
+    \item \textbf{First-use}: The set of nodes that have uses of a variable $y$ and for which there is a def-clear and use-clear path from the call site to the nodes.
+    \item A \textbf{coupling du-path} is from a last-def to a first-use.
+    \item \textbf{All-coupling-def coverage}: A path is to be executed from every last-def to at least one first-use.
+    \item \textbf{All-coupling-use coverage}: A path is to be executed from every last-def to every first-use.
+    \item \textbf{All-coupling-Du-paths coverage}: Every simple path from every last-def to every first-use needs to be executed.
+    \item The above criteria can be met with side trips.
+    \item Only variables that are used or defined in the callee are considered for du-pairs and criteria.
+    \item \textbf{Transitive du-pairs} (A calls B, B calls C and there is a variable defined in A and used in C) is not supported in this analysis.
+\end{itemize}
+
+\section{Specification Testing}
+\subsection{Sequencing Constraints}
+\begin{itemize}
+    \item A \textbf{design specification} describes aspects of what behavior a software should exhibit. Behaviour exhibited by software need not mean the implementation directly. It could be a \textbf{model} of the implementation.
+    \item For testing with graphs, we consider two types of design specifications. \textbf{Sequencing constraints} on methods/functions, and \textbf{State behavior} descriptions of software.
+    \item \textbf{Sequencing constraints} are rules that impose constraints on the order in which methods may be called.
+    \item Typically encoded as preconditions or other specifications. They may or may not be given as a part of the specification or design.
+    \item Consider the example of a simple Queue, a precondition can be that at least one element must be on the queue before removing and a postcondition can be that $e$ is on the end of the queue to enqueue $e$.
+    \item Simple sequencing constraint: enqueue must be called before dequeue.
+    \item This does not include the requirement that we must have at least as many enqueue calls as dequeue calls. Need \textit{memory} which can be captured in the \textit{state} of the queue as the application code executes.
+    \item Absence of sequencing constraints usually indicates more faults.
+\end{itemize}
+
+\subsection{Finite State Machines}
+\begin{itemize}
+    \item A \textbf{Finite State Machine} is a graph that describes how software variables are modified during execution.
+    \item Nodes: \textbf{States}, representing sets of values for (key) variables.
+    \item Edges: \textbf{Transitions}, which model possible changes from one state to another. Transitions have \textbf{guards} and/or \textbf{actions} associated with them.
+    \item FSMs can model many kinds of systems like embedded software, abstract data types, hardware circuits etc.
+    \item Creating FSM models for design helps in precise modelling and early detection of errors through analysis of the model.
+    \item Many modelling notations support FSMs: Unified Modeling Language(UML), state tables, Boolean logic etc.
+    \item FSMs are good for modelling control intensive applications not ideal for modelling data intensive applications.
+    \item FSMs can be annotated with different types of \textbf{actions}: Actions on transitions, Entry actions to nodes, Exit actions on nodes.
+    \item Actions can express changes to variables or conditions on variables.
+    \item \textbf{Preconditions (guards)}: Conditions that must be true for transition to be taken.
+    \item \textbf{Triggering events}: Changes to variables that cause transitions to be taken.
+    \item Node coverage: Execute every state(state coverage).
+    \item Edge coverage: Execute every transition(transition coverage).
+    \item Edge-pair coverage: Execute every pair of transitions(transition-pair).
+    \item Control flow graphs are \textbf{not} FSMs representing software/codes.
+    \item Call graphs are also \textbf{not} FSMs representing software/codes.
+    \item We need to consider values of variables to represent states of FSMs and statements/actions that result in change of values of variables(states) result in transitions.
+\end{itemize}
+
+\section{Testing Source Code: Classical Coverage Criteria}
+\begin{itemize}
+    \item The most common graph model for source code is control flow graph.
+    \item Structural coverage criteria over control flow graphs deal with \textbf{covering} the code in some way or other.
+    \item Data flow graphs augments the control flow with data.
+    \item \textbf{Code coverage}: Statement coverage, branch coverage, decision coverage, Modified Condition Decision Coverage(MCDC), path coverage etc.
+    \item Node coverage is same as statement coverage, edge coverage is same as branch, and prime path coverage is the same as loop coverage.
+    \item \textbf{Cyclomatic complexity}: Basis path testing, structural testing. It is a software metric used to indicate the (structural) complexity of a program.
+    \item Cyclomatic complexity represents the number of \textbf{linearly independent paths} in the control flow graph of a program.
+    \item \textbf{Basis path testing} deals with testing each linearly independent path in the CFG of the program.
+    \item A \textbf{linearly independent path} of execution in the CFG of a program is a path that does not contain other paths within it. This is very similar to prime paths, every linearly independent path is a prime path.
+    \item The cyclomatic complexity $M=E-N+2P$, where $E$ is the number of edges, $N$ is the number of nodes, and $P$ is the number of connected components.
+    \item When graph correspond to a single program, $M=E-N+2$.
+    \item Another way of measuring cyclomatic complexity is to consider \textit{strongly connected components} in CFG. Can be obtained by connecting the final node back to the initial node. Cyclomatic complexity obtained this way is popularly called as \textbf{cyclomatic number}.
+    \item If it is less than 10 then the code is not too complex.
+    \item \textbf{Data flow testing}: Data flow coverage.
+    \item \textbf{Decision-to-decision path} is a path of execution between two decisions in the CFG.
+    \item A \textbf{chain} is a path in which initial and terminal vertices are distinct. All the interior vertices have both in-degree and out-degree as 1.
+    \item A \textbf{maximal chain} is a chain that is not a part of any other.
+    \item A \textbf{DD-path} is a set of vertices in the CFG that satisfies one of the following conditions:
+    \begin{enumerate}
+        \item It consists of a single vertex with in-degree 0(initial vertex).
+        \item It consists of a single vertex with out-degree 0(terminal vertex).
+        \item It consists of a single vertex with in-degree $\geq 2$ or out-degree $\geq 2$(decision vertices).
+        \item It consists of a single vertex with in-degree and out-degree as 1.
+        \item It is a maximal chain of length $\geq 1$.
+    \end{enumerate}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/ST_Graph_summary.png}
+        \caption{Graph Coverage Criteria Summary}
+        \label{fig:ST-graph-coverage-summary}
+    \end{figure}
 \end{itemize}
 
 \end{document}

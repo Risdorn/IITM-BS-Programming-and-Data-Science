@@ -37,5 +37,13 @@
 \graphicspath{{./static/}}
 \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt
 
+\usepackage{pdfpages}
+
+\newlength{\originalVOffset}
+\newlength{\originalHOffset}
+\setlength{\originalVOffset}{\voffset}   
+\setlength{\originalHOffset}{\hoffset}
+
 \newcommand{\LComment}[1]{\State \(\triangleright\) \text{#1}}
 \MakeRobust{\Call}
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}%

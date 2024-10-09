@@ -28,18 +28,18 @@ def computingPrimePath(G, finalVertices):
             else:
                 # Otherwise, add the path to the queue
                 Q.append(newPath)
-    prime = computePrime(Loops, Terminate, Detour, finalVertices)
-    return prime, Loops, Terminate, Detour
+    testpaths = computeTestPaths(Loops, Terminate, Detour, finalVertices)
+    return testpaths, Loops, Terminate, Detour
 
-def computePrime(Loops, Terminate, Detour, finalVertices):
+def computeTestPaths(Loops, Terminate, Detour, finalVertices):
     complete = []
     # Isolate paths that start from the initial vertice and end in a final vertice
     for path in Terminate:
         if path[0] == 0 and path[-1] in finalVertices:
             complete.append(path)
     # For each path, check if there is a loop or detour that can be inserted
-    primes = []
-    primes.extend(complete)
+    testpath = []
+    testpath.extend(complete)
     for j, path in enumerate(complete):
         store_detour = []
         store = []
@@ -55,30 +55,30 @@ def computePrime(Loops, Terminate, Detour, finalVertices):
             newPath = complete[j][:i]
             newPath.extend(loop)
             newPath.extend(suffix)
-            primes.append(newPath)
+            testpath.append(newPath)
         for i, loop in store:
             suffix = complete[j][i+1:]
             newPath = complete[j][:i]
             newPath.extend(loop)
             newPath.extend(suffix)
-            primes.append(newPath)
+            testpath.append(newPath)
     # Remove duplicates
-    primes = [list(x) for x in set(tuple(x) for x in primes)]
-    return primes
+    testpath = [list(x) for x in set(tuple(x) for x in testpath)]
+    return testpath
 
-#G = [[1,4], [2,5], [3], [1], [4,6], [6], []]
+G = [[1,4], [2,5], [3], [1], [4,6], [6], []]
 #G = [[1], [2,5], [3,4], [4], [1], []]
-G = [[1], [2,3], [6], [4,5], [3], [6], []]
-Prime, Loops, Terminate, Detour = computingPrimePath(G, [6])
-print("Prime Paths:")
-for path in Prime:
+#G = [[1], [2,3], [6], [4,5], [3], [6], []]
+TestPaths, Loops, Terminate, Detour = computingPrimePath(G, [6])
+print("Test Paths:")
+for path in TestPaths:
     print(path)
-print("Loops:")
+print("Paths that are Loops:")
 for path in Loops:
     print(path)
-print("Detour:")
+print("Paths that are a Detour:")
 for path in Detour:
     print(path)
-print("Terminate:")
+print("Paths that Terminate:")
 for path in Terminate:
     print(path)

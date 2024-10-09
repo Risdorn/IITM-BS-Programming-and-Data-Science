@@ -1,11 +1,5 @@
 \documentclass[a4paper]{article}
 \input{head}
-\usepackage{pdfpages}
-
-\newlength{\originalVOffset}
-\newlength{\originalHOffset}
-\setlength{\originalVOffset}{\voffset}   
-\setlength{\originalHOffset}{\hoffset}
 
 \begin{document}
 
@@ -110,6 +104,33 @@ AI: Search Methods for Problem-Solving
     \end{algorithm}
     \item A few other examples are \textbf{The Eight Puzzle}, \textbf{The Man, Goat, Lion, Cabbage} and \textbf{The N-Queens Problem}.
 \end{itemize}
+Before studying different algorithms, we need to familiarize ourselves with some pseudocode syntax.
+
+\pagebreak
+\setlength{\voffset}{0cm}
+\setlength{\hoffset}{0cm}
+\includepdf[pages={1}, trim=0 71cm 0 0, clip]{AI_reference.pdf}
+\setlength{\voffset}{\originalVOffset}
+\setlength{\hoffset}{\originalHOffset}
+\pagebreak
+\setlength{\voffset}{0cm}
+\setlength{\hoffset}{0cm}
+\includepdf[pages={1}, trim=0 45cm 0 26cm, clip]{AI_reference.pdf}
+\setlength{\voffset}{\originalVOffset}
+\setlength{\hoffset}{\originalHOffset}
+\pagebreak
+\setlength{\voffset}{0cm}
+\setlength{\hoffset}{0cm}
+\includepdf[pages={1}, trim=0 20cm 0 50.5cm, clip]{AI_reference.pdf}
+\setlength{\voffset}{\originalVOffset}
+\setlength{\hoffset}{\originalHOffset}
+\pagebreak
+\setlength{\voffset}{0cm}
+\setlength{\hoffset}{0cm}
+\includepdf[pages={1}, trim=0 0 0 76.5cm, clip]{AI_reference.pdf}
+\setlength{\voffset}{\originalVOffset}
+\setlength{\hoffset}{\originalHOffset}
+\pagebreak
 
 \subsection{General Search Algorithms}
 \begin{itemize}
@@ -321,6 +342,7 @@ AI: Search Methods for Problem-Solving
             \State \Return path
         \end{algorithmic}
     \end{algorithm}
+    \item DFID-C as compared to regular DFID-N adds new neighbors to OPEN list and also adds neighbors that are in CLOSED but not in OPEN list. This allows DFID-C to get the shortest path whereas DFID-N may not get the shortest path.
     \item The monster that AI fights is Combinatorial Explosion.
     \item All these algorithms we studied are blind algorithms or uniformed search, they don't know where the goal is.
 \end{itemize}
@@ -345,6 +367,7 @@ AI: Search Methods for Problem-Solving
                 \State children $\gets$ \Call{MoveGen}{N}
                 \State newNodes $\gets$ \Call{RemoveSeen}{children, OPEN, CLOSED}
                 \State newPairs $\gets$ \Call{MakePairs}{newNodes, N}
+                \LComment{Again, this is pretty much the most important line}
                 \State OPEN $\gets$ sort$_h$(newPairs ++ tail OPEN)
             \EndWhile
             \State \Return [ ]
@@ -380,13 +403,31 @@ AI: Search Methods for Problem-Solving
         \item \textbf{Nearest Neighbor Heuristic}: Start at some city, move to nearest neighbor as long as it does not close the loop prematurely.
         \item \textbf{Greedy Heuristic}: Sort the edges, then add the shortest available edge to the tour as long as it does not close the loop prematurely.
         \item \textbf{Savings Heuristic}: Start with $n-1$ tours of length $2$ anchored on a base vertex and performs $n-2$ merge operations to construct the tour.
-        \item \textbf{Perturbation operators}: Start with some tour, then choose two cities and interchange, this gives the solution space.
+        \item \textbf{Perturbation operators}: Start with some tour, then choose two cities and interchange, this gives the solution space. Heuristic function is $saving$ = $cost(base,a)$ + $cost(base,b)$ - $cost(a,b)$
         \item \textbf{Edge Exchange}: Similar to above but now instead of choosing cities we are choosing edges. Can be $2$-edge exchange, $3$-edge, $4$-edge, etc. City exchange is a special case of $4$-edge exchange.
     \end{enumerate}
     \item Solution space of TSP grows in order factorial, much faster than SAT problem.
     \item A collection of problems with some solutions is available \href{http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/}{here}.
     \item To escape local minima we need something called \textbf{exploration}.
     \item \textbf{Beam Search}: Look at more than one option at each level. For a beam width $b$, look at best $b$ options. Heavily memory dependent.
+    \begin{algorithm}
+        \caption{Beam Search}\label{alg:Beam-Search}
+        \begin{algorithmic}
+            \Statex \Call{BeamSearch}{$S,w$}
+            \State OPEN $\gets$ $[S]$
+            \State $N$ $\gets$ $S$
+            \Do
+                \State $bestEver$ $\gets$ $N$
+                \If{\Call{Goal-Test}{OPEN} = True}
+                    \State \Return goal from OPEN
+                \EndIf
+                \State $neighbors$ $\gets$ \Call{MoveGen}{OPEN}
+                \State OPEN $\gets$ take w $sort_h(neighbors)$
+                \State $N$ $\gets$ head(OPEN)
+            \doWhile{$h(N)$ is better than $h(bestEver)$}
+            \State \Return $bestEver$
+        \end{algorithmic}
+    \end{algorithm}
     \item \textbf{Variable Neighborhood Descent}: Essentially we are doing hill climbing with different neighborhood functions. The idea is to use sparse functions before using denser functions, so the storage is not high. The algorithm assumes that there are $N$ $moveGen$ functions sorted according to the density of the neighborhoods produced.
     \begin{algorithm}[H]
         \caption{Variable Neighborhood Descent}\label{alg:Variable-Neighborhood-Descent}
@@ -432,6 +473,224 @@ AI: Search Methods for Problem-Solving
             \State \Return $bestSeen$
         \end{algorithmic}
     \end{algorithm}
+\end{itemize}
+
+\section{Stochastic Search}
+Very often to escape local minima we use Stochastic/Randomized methods instead of Deterministic methods.
+\subsection{Iterated Hill Climbing}
+\begin{itemize}
+    \item \textbf{2SAT}: Problems where each clause has at most two literals, known to be solved in polynomial time. However, if we add even 1 more literal it would become NP-complete or exponential.
+    \item Iterated hill climbing says that we should perform hill climbing with multiple different starting nodes chosen randomly to have a higher probability of finding the goal node.
+    \begin{algorithm}[H]
+        \caption{Iterated Hill Climbing}\label{alg:AI-iterated-hill-climbing}
+        \begin{algorithmic}[1]
+            \Statex \Call{Iterated-Hill-Climbing}{$N$}
+            \State $bestNode$ $\gets$ \textbf{random candidate solution}
+            \For{$i\gets$ $1$ to $N$}
+                \State $currentBest$ $\gets$ \Call{Hill-Climbing}{\textbf{new random candidate solution}}
+                \If{$h(currentBest)$ is better than $h(bestNode)$}
+                    \State $bestNode$ $\gets$ $currentBest$
+                \EndIf
+            \EndFor
+            \State \Return $bestNode$
+        \end{algorithmic}
+    \end{algorithm}
+\end{itemize}
+
+\subsection{Stochastic Actions}
+\begin{itemize}
+    \item To move or not to move is the question.
+    \item Idea is we would like to consider actions that are good in terms of heuristic functions, but sometimes we even want to move when heuristic function is not necessarily good.
+    \item \textbf{Random Walk}: Choose a random node and move there, hill climbing of stochastic search.
+    \begin{algorithm}[H]
+        \caption{Random Walk}\label{alg:AI-random-walk}
+        \begin{algorithmic}[1]
+            \Statex \Call{RandomWalk}{ }
+            \State $node$ $\gets$ random candidate solution or start
+            \State $bestNode$ $\gets$ $node$
+            \For{$i\gets$ $1$ to $n$}
+                \State $node$ $\gets$ \Call{RandomChoose}{\Call{MoveGen}{$node$}}
+                \If{$node$ is better than $bestNode$}
+                    \State $bestNode$ = $node$
+                \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+    \item \textbf{Stochastic Hill Climbing}: Let the algorithm be at the current bode $v_c$, then we select a random neighbor $v_N$ and calculate $\Delta E=(eval(v_N)-eval(v_c))$.\\
+    If $\Delta E$ is positive, it means that $v_N$ is better than $v_c$, then the algorithm should move to it with a higher probability.\\
+    If $\Delta E$ is negative, it means that $v_N$ is better than $v_c$, then the algorithm should move to it with a lower probability.\\
+    The probability is computed using the sigmoid function, which is given as
+    \begin{equation*}
+        \text{Probability }P=\frac{1}{1+e^{-\frac{\Delta E}{T}}}
+    \end{equation*}
+    where $T$ is a parameter. The algorithm essentially combines exploration with exploitation.
+    \item \textbf{Annealing}: In metallurgy and materials science, \textbf{annealing} is a heat treatment that alters the physical and sometimes chemical properties of a material to increase its ductility and reduce its hardness, making it more workable. It involves heating a material above its recrystallization temperature, maintaining a suitable temperature for an appropriate amount of time and then cooling.\\
+    In annealing, atoms migrate in the crystal lattice and the number of dislocations decreases, leading to a change in ductility and hardness. As the material cools it recrystallizes.
+    \item \textbf{Simulated Annealing}: Essentially tries to mimic the annealing process, begins with exploration and ends with exploitation. Annealing is also where $\Delta E$ and $T$ come from, essentially meaning Energy and Temperature.
+    \begin{algorithm}[H]
+        \caption{Simulated Annealing}\label{alg:simulated-annealing}
+        \begin{algorithmic}[1]
+            \Statex \Call{SimulatedAnnealing}{ }
+            \State $node\gets$ random candidate solution or start
+            \State $bestNode\gets$ $node$
+            \State $T\gets$ some large value
+            \For{$time\gets$ $1$ to $numberOfEpochs$}
+                \While{some termination criteria} \Comment{$M$ cycles in a sample case}
+                    \State $neighbor\gets$ \Call{RandomNeighbor}{$node$}
+                    \State $\Delta E\gets$ $Eval(neighbor)-Eval(node)$
+                    \If{$Random(0,1)<$ \Call{Sigmoid}{$\Delta E, T$}}
+                        \State $node\gets$ $neighbor$
+                        \If{$Eval(node)>Eval(bestNode)$}
+                            \State $bestNode\gets$ $node$
+                        \EndIf
+                    \EndIf
+                \EndWhile
+                \State $T\gets$ \Call{CoolingFunction}{$T,times$}
+            \EndFor
+            \State \Return $bestNode$
+        \end{algorithmic}
+    \end{algorithm}
+\end{itemize}
+
+\subsection{Genetic Algorithms}
+\begin{itemize}
+    \item Survival of the fittest. Inspired by the process of natural selection.
+    \item A class of methods for optimization problems, more generally known as Evolutionary Algorithms.
+    \item Implemented on a population of candidates in the solution space. A fitness function evaluates each candidate. The fittest candidates get to mate and reproduce.
+    \item \textbf{Artificial Selection}: Given a population of candidate solutions we do a three step iterative process
+    \begin{enumerate}
+        \item \textbf{Reproduction}: Clone each candidate in proportion to its fitness. Some may get more than one copy, some none.
+        \item \textbf{Crossover}: Randomly mate the resulting population and mix up the genes.
+        \item \textbf{Mutation}: Once in a while, in search of a missing gene.
+    \end{enumerate}
+    \item \textbf{Selection}: Imagine a roulette wheel on which each candidate in the parent population $\{P_1,P_2,...,P_N\}$ is represented as a sector. The angle subtended by each candidate is proportional to its fitness. The roulette wheel is spun $N$ times. Then the selected parents are added one by one to create a new population.
+    \item \textbf{Crossover Operators}: A \textit{single point crossover} simply cuts the two parents at a randomly chosen point and recombines them to form two new solution strings. It can be at multiple points as well, idea is to mix up the genes.
+    \begin{algorithm}[H]
+        \caption{Genetic Algorithm}\label{alg:genetic-algorithm}
+        \begin{algorithmic}[1]
+            \Statex \Call{Genetic-Algorithm}{ }
+            \State $P\gets$ create $N$ candidate solutions \Comment{initial population}
+            \Repeat
+                \State compute fitness value for each member of $P$
+                \State $S\gets$ with probability proportional to fitness value, randomly select $N$ member from $P$.
+                \State $offspring\gets$ partition $S$ into two halves, and randomly mate and crossover members to generate $N$ offsprings.
+                \State With a low probability mutate some offsprings
+                \State Replace $k$ the weakest members of $P$ with $k$ strongest offsprings
+            \Until{some termination criteria}
+            \State \Return the best member of $P$
+        \end{algorithmic}
+    \end{algorithm}
+    \item A large diverse population size is necessary for the performance of genetic algorithm to work.
+    \item One issue is how to represent candidate solutions?, as they can be of any type. One simple solution is to convert the solution into a string this will require an additional function.
+    \item In TSP, one problem is also that during crossover some cities can get repeated.
+    \item \textbf{Cycle Crossover}: Identify cycles, look at below image, easier to understand.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree//static/AI_TSP_ga_cycle1.png}
+            \caption{TSP cycle 1}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree//static/AI_TSP_ga_cycle2.png}
+            \caption{TSP cycle 2}
+        \end{subfigure}
+        \caption{TSP Identifying cycles}
+    \end{figure}
+    Once cycles are identified, then $C_1$ gets odd numbered cycles from $P_1$ and even numbered cycles from $P_2$ the other go to $C_2$.
+    \item \textbf{Partially Mapped Crossover(PMX)}: Identify some cities that form a subtour and establish a mapping.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/AI_TSP_partialcrossover_subtour.png}
+            \caption{Choose Subtour}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/AI_TSP_partialcrossover_rest.png}
+            \caption{Copy occupied spaces}
+        \end{subfigure}
+        \caption{Partially Mapped Crossover}
+    \end{figure}
+    \item \textbf{Order Crossover}: Copy a subtour from $P_1$ into $C_1$ and the remaining from $P_2$ in the order they occur in $P_2$.
+    \item For all the above we were using path representation of TSP, there is another representation of TSP.
+    \item \textbf{Adjacency Representation}: The cities are arranged based on where they come from in the tour with respect to the index. For example if $A\rightarrow H$, then at index 0 we would have $H$.
+    \item \textbf{Alternating Edges Crossover}: From a given city $X$ choose the next city $Y$ from $P_1$ and from the city $Y$ choose the next city from $P_2$ and so on. It is possible to run into cycles, need to be careful.
+    \item \textbf{Heuristic Crossover}: For each city choose the next from that parent $P_1$ or $P_2$ whichever is closer.
+    \item \textbf{Ordinal Representation}: Replace the name of the city is Path Representation one by one to its current numeric index. At the start all cities $A,B,C,D,E$ will have numeric index $1,2,3,4,5$, now consider if we add $C$ to the representation the new indexing would be for cities $A,B,D,E$, we have $1,2,3,4$. The \textbf{advantage} is that single point crossover produces valid offspring.
+\end{itemize}
+
+\subsection{Ant Colony Optimization}
+\begin{itemize}
+    \item \textbf{Emergent Systems}: Collections of simple entities organize themselves and a larger more sophisticated entity emerges. The behavior of this complex system is a property that emerges from interactions amongst its components.
+    \item \textbf{Conway's Game of Life}: A cellular automaton in which cells are alive or dead. Each cell obeys the following rules to decide its fate in the next time step.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            Cell state & Number of alive neighbors & New cell state \\
+            \hline
+            alive & $<2$ & dead \\
+            \hline
+            alive & 2 or 3 & alive \\
+            \hline
+            alive & $>3$ & dead \\
+            \hline
+            dead & 3 & alive \\
+            \hline
+        \end{tabular}
+        \caption{Rules for Game of Life}
+        \label{tab:AI-rules-game-life}
+    \end{table}
+    \item Illusion of movement can be seen in an example called \textbf{Gosper's Glider Gun}.
+    \item \textbf{Chaos and Fractals}: A fractal is a never-ending pattern. Fractals are infinitely complex patterns that are self-similar across different scales. They are created by repeating a simple process over and over in an ongoing feedback loop. Drive by recursion, fractals are images of dynamic systems, the pictures of chaos.
+    \item Let 5 ants $A,B,C,D,$ and $E$ go out in search for food. Each ant lays a trail of pheromone where it goes. Each ant lays a trail of pheromone where it goes. More ants that emerge will tend to follow some pheromone trail.
+    \item Let's say $A$ finds some food, then it will follow its pheromone trail back and the other ants will continue their search.
+    \item Eventually, as more ants travel on the trail they deposit more pheromone and the trail gets stronger and stronger, eventually becoming the caravan we might have seen raiding our food. 
+    \item They tend to find the shortest path.
+    \item \textbf{Ant Colony Optimization}: We try to capitalize on this method. Each ant constructs a solution using a stochastic greedy method using a combination of a heuristic function and pheromone trail following.
+    \item This is related to the class of algorithms known as \textit{Swarm Optimization}.
+    \begin{algorithm}[H]
+        \caption{Ant Colony Optimization for TSP}\label{alg:AI-ant-colony-tsp}
+        \begin{algorithmic}[1]
+            \Statex \Call{TSP-ACO}{ }
+            \State $bestTour\gets$ NIL
+            \Repeat
+                \State randomly place $M$ ants on $N$ cities
+                \For{each ant $a$}
+                    \For{$n\gets$ $1$ to $N$}
+                        \State ant $a$ selects an edge from the distribution $P_n^a$
+                    \EndFor
+                \EndFor
+                \State update $bestTour$
+                \For{each ant $a$}
+                    \For{each edge $(u,v)$ in the ant's tour}
+                        \State deposit pheromone $\propto$ 1/tour-length on edge $(u,v)$
+                    \EndFor
+                \EndFor
+            \Until{some termination criteria}
+            \State \Return $bestTour$
+        \end{algorithmic}
+    \end{algorithm}
+    \item From a city $i$ the $k^{th}$ ant moves to city $j$ with a probability given by
+    \begin{equation*}
+        P^k_{ij}(t)=\begin{cases}
+            \frac{[\tau_{ij}(t)]^\alpha \times [\eta_{ij}]^\beta}{\sum_{h\in allowed_k(t)}([\tau_{ih}(t)]^\alpha [\eta_{ih}(t)]^\beta)},\text{ if }j\in allowed_k(t)\text{ the cities ant }k\text{ is allowed to move to}\\
+            0,\text{ otherwise}
+        \end{cases}
+    \end{equation*}
+    where $\tau_{ij}(t)$ is pheromone on edge$_{ij}$ and $\eta_{ij}$ is called visibility which is inversely proportional to the distance between cities $i$ and $j$.
+    \item After constructing a tour in $n$ time steps, each ant $k$ deposits an amount of pheromone $\frac{Q}{L_k}$ on the edges it has traversed, which is inversely proportional to the cost of the tour $L_k$ it found.
+    \item Total pheromone deposited on edge$_{ij}$ is $\Delta \tau_{ij}(t,t+n)$
+    \item The total pheromone on edge$_{ij}$ is updated as
+    \begin{equation*}
+        \tau_{ij}(t+n)=(1-\rho)\times \tau_{ij}(t)+\Delta \tau_{ij}(t,t+n)
+    \end{equation*}
+    where $\rho$ is the rate of evaporation of pheromone.
 \end{itemize}
 
 \end{document}

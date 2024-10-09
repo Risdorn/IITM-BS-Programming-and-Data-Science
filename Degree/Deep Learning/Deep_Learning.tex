@@ -2,11 +2,6 @@
 \input{head}
 \usepackage{pdfpages}
 
-\newlength{\originalVOffset}
-\newlength{\originalHOffset}
-\setlength{\originalVOffset}{\voffset}   
-\setlength{\originalHOffset}{\hoffset}
-
 \begin{document}
 
 \fancyhead[c]{}
@@ -655,6 +650,92 @@ Deep Learning
         \end{algorithmic}
     \end{algorithm}
     \item $g'$ for logistic function $\sigma(z)$ is $g(z)(1-g(z))$ and for tanh function is $1-(g(z))^2$.
+    \item On flat surfaces, gradient descent moves very slow. How do we solve this?
 \end{itemize}
+
+\section{Gradient Descent Types}
+\subsection{Momentum based Gradient Descent}
+\begin{itemize}
+    \item \textbf{Intuition}: If I am repeatedly being asked to move in the same direction then I should probably gain some confidence and start taking bigger steps in that direction. Just as a ball gains momentum while rolling down a slope.
+    \item Update rule for momentum based gradient descent is
+    \begin{equation*}
+        \begin{split}
+            &u_t=\beta u_{t-1}+\nabla w_t,\hspace{1cm}u_0=\nabla w_0,\text{ }u_{-1}=0\\
+            &w_{t+1}=w_t-\eta u_t
+        \end{split}
+    \end{equation*}
+    \item We are not only considering the current gradient, but we are also giving some importance to past history. $\beta$ is typically less than 1, so we give decreasing importance to previous histories. We have
+    \begin{equation*}
+        u_t = \beta u_{t-1}+\nabla w_t = \beta^2u_{t-2}+\beta \nabla w_{t-1}+\nabla w_t = ... = \sum_{\tau=0}^t\beta^{t-\tau}\nabla w_\tau
+    \end{equation*}
+    \item In addition to current update, also look at the history of updates.
+    \item Even in the regions having gentle slopes, momentum based gradient descent is able to take large steps because the momentum carries it along.
+    \item However, there is a possibility of overshooting our goal. This overshoot could lead to oscillations as well.
+    \item Despite these oscillations, it will converge faster than gradient descent.
+\end{itemize}
+
+\subsection{Nesterov Accelerated Gradient Descent}
+\begin{itemize}
+    \item Can we do something to reduce the oscillations observed in momentum based gradient descent?
+    \item \textbf{Intuition}: Look before you leap, we ask the weights to move by two parts $\beta u_{t-1}$ and $\nabla w_t$. The idea is to first move by $\beta u_{t-1}$ and then compute $\nabla w_t$. So instead of relying only on current gradient we are essentially "looking ahead" and computing new gradient.
+    \item Update rule for NAG is
+    \begin{equation*}
+        \begin{split}
+            &u_t = \beta u_{t-1} + \nabla (w_t-\beta u_{t-1})\\
+            &w_{t+1} = w_t - \eta u_t\\
+            &\text{with }u_{-1}=0,\text{ and }0\leq \beta \leq 1
+        \end{split}
+    \end{equation*}
+\end{itemize}
+
+\subsection{Stochastic vs Batch Gradient Descent}
+\begin{itemize}
+    \item Regular gradient descent goes over the entire data once before updating the parameters. Because this is the true gradient of the loss as derived earlier. Hence, theoretical guarantees hold.
+    \item Imagine we have a million points in the training data, then it will take very long.
+    \item In \textbf{stochastic} version, we update the parameters for every point in the data. Now if we have a million data points then we will make a million updates in each epoch.
+    \item However, this is an approximate gradient. Hence, we have no guarantee that each step will decrease the loss.
+    \item So, going over a large data once is bad, going over a single point and updating is bad, but going over some data points and updating is ok.
+    \item This is the idea for \textbf{mini-batch} gradient descent.
+    \item 1 epoch is one pass over the entire data, 1 step is one update of the parameters, $N$ is the number of data points, and $B$ is the mini batch size.
+    \item So, for regular gradient descent the number of epochs is the same as number of steps, for stochastic gradient descent the number of steps is the same as $N$, and for mini-batch gradient descent the number of steps is the same as $\frac{N}{B}$.
+    \item It is intuitive that a larger batch size is better, but we sacrifice on time.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|}
+            \hline
+            \textbf{Algorithm} & \textbf{\# of steps in 1 epoch}\\
+            \hline
+            Vanilla (Batch) Gradient Descent & 1 \\
+            \hline
+            Stochastic Gradient Descent & $N$\\
+            \hline
+            Mini Batch Gradient Descent & $\frac{N}{B}$\\
+            \hline
+        \end{tabular}
+        \caption{Stochastic vs Mini Batch Gradient Descent}
+        \label{tab:DL-stochastic-vs-mini-batch}
+    \end{table}
+\end{itemize}
+
+\subsection{Scheduling Learning Rate}
+\begin{itemize}
+    \item Instead of using momentum and NAG we could have simply increased the learning rate, but on regions which have a steep slope, the already large gradient would blow up farther.
+    \item What we need is for the learning rate to be small when gradient is high and vice versa.
+    \item Tune learning rate, try different values on a log scale: $0.0001, 0.001, 0.001, 0.1, 1.0$.
+    \item Run a few epochs with each of these and figure out a learning rate which works best. Now do a finer search around this value.
+    \item These are just heuristics, no clear winning strategy.
+    \item \textbf{Annealing learning rate}: Decrease the learning rate as we get close to the minima.
+    \item \textbf{Step Decay}: Halve the learning rate after every 5 epochs or halve the learning rate after an epoch if the validation error is more than what it was at the end of the previous epoch.
+    \item \textbf{Exponential Decay}: $\eta = \eta_0^{-kt}$, where $\eta_0$ and $k$ are hyperparameters and $t$ is a step number. However, choosing $k$ becomes complex.
+    \item \textbf{1/t Decay}: $\eta = \frac{\eta_0}{1+kt}$, again choosing $k$ is a bit tricky, ideally we won't use these learning rates.
+    \item For momentum the following schedule was suggested by Sutskever et al., 2013
+    \begin{equation*}
+        \beta_t = min(1-2^{-1-\log_2{(\lfloor \frac{t}{250}\rfloor+1})},\beta_{max})
+    \end{equation*}
+    $\beta_{max}$ is chosen from $\{0.999,0.995,0.99,0.9,0\}$
+    \item In practice, often a line search is done to find a relatively better value of $\eta$. Update $w$ using different values of $\eta$ then pick the best $w$ based on loss function.
+\end{itemize}
+
+%\section{Gradient Descent with Adaptive Learning Rates}
 
 \end{document}
