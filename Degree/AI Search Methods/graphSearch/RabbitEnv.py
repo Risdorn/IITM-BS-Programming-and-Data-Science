@@ -2,7 +2,7 @@
 This file contains the environment for the rabbit problem.
 """
 
-from GraphSearch import BreadthFirstSearch
+from graphSearch.GraphSearch import BreadthFirstSearch
 
 class RabbitEnv:
     def __init__(self):

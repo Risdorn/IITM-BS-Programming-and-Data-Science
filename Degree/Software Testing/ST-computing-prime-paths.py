@@ -5,9 +5,11 @@ def computingPrimePath(G, finalVertices):
     Loops = [ ]
     Terminate = [ ]
     Detour = [ ]
+    simplePaths = [ ]
     Q = [ ]
     for v in range(len(G)):
         Q.append([v])
+    simplePaths.extend(Q)
     while Q:
         path = Q.pop(0)
         if path[-1] in finalVertices:
@@ -28,8 +30,12 @@ def computingPrimePath(G, finalVertices):
             else:
                 # Otherwise, add the path to the queue
                 Q.append(newPath)
+                simplePaths.append(newPath)
     testpaths = computeTestPaths(Loops, Terminate, Detour, finalVertices)
-    return testpaths, Loops, Terminate, Detour
+    simplePaths.extend(Loops)
+    simplePaths.extend(Terminate)
+    simplePaths = [list(x) for x in set(tuple(x) for x in simplePaths)] # Remove duplicates
+    return testpaths, Loops, Terminate, Detour, simplePaths
 
 def computeTestPaths(Loops, Terminate, Detour, finalVertices):
     complete = []
@@ -69,7 +75,9 @@ def computeTestPaths(Loops, Terminate, Detour, finalVertices):
 G = [[1,4], [2,5], [3], [1], [4,6], [6], []]
 #G = [[1], [2,5], [3,4], [4], [1], []]
 #G = [[1], [2,3], [6], [4,5], [3], [6], []]
-TestPaths, Loops, Terminate, Detour = computingPrimePath(G, [6])
+#G = [[1], [2,3], [1], [4,5], [3], []]
+G = [[1,2], [3], [3,4], [6], [5,6], [2], []]
+TestPaths, Loops, Terminate, Detour, simplePaths = computingPrimePath(G, [6])
 print("Test Paths:")
 for path in TestPaths:
     print(path)
@@ -82,3 +90,8 @@ for path in Detour:
 print("Paths that Terminate:")
 for path in Terminate:
     print(path)
+    
+print("Simple Paths:")
+for path in simplePaths:
+    print(path)
+print("Number of Simple Paths:", len(simplePaths))

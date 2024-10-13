@@ -5,7 +5,7 @@ This file implements the following heuristic search algorithms:
 3. Best Neighbor Search
 """
 
-from HeuristicFunctions import EightTiles, BlockTower
+from heuristicSearch.HeuristicFunctions import EightTiles, BlockTower
 
 def RemoveSeen(nodeList, Open, Closed):
     """

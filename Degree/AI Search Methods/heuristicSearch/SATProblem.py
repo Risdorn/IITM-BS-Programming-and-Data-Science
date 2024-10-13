@@ -1,4 +1,4 @@
-from HeuristicSearch import BeamSearch
+from heuristicSearch.HeuristicSearch import BeamSearch
 
 class SATProblem:
     def __init__(self, clauses):

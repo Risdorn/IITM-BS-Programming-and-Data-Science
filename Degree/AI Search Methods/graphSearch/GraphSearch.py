@@ -7,7 +7,7 @@ Iterative Deepening Search - N
 Iterative Deepening Search - C
 """
 
-from GeneralSearch import graph
+from graphSearch.GeneralSearch import graph
 import sys
 
 def RemoveSeen(nodeList, Open, Closed):

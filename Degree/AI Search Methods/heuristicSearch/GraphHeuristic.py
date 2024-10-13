@@ -1,7 +1,7 @@
-from ..graphSearch.GeneralSearch import graph
-from HeuristicSearch import BestFirstSearch, HillClimbing, BeamSearch, BestNeighborDescent
-from ..graphSearch.GraphSearch import BreadthFirstSearch
-from TravellingSalesman import TravellingSalesman
+from graphSearch.GeneralSearch import graph
+from heuristicSearch.HeuristicSearch import BestFirstSearch, HillClimbing, BeamSearch, BestNeighborDescent
+from graphSearch.GraphSearch import BreadthFirstSearch
+from heuristicSearch.TravellingSalesman import TravellingSalesman
 import sys
 
 class graphHeuristic(graph):
