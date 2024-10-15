@@ -401,5 +401,80 @@ Software Engineering
     \item One good software to do this is \textbf{Pivotal Tracker}, Link for which can be found \href{https://www.pivotaltracker.com/}{here}.
 \end{itemize}
 
+\section{Software Design}
+\subsection{Outcomes of the Design Process}
+\begin{itemize}
+    \item We will design an high level view of software architecture
+    \begin{enumerate}
+        \item \textbf{Components}: Collection of functions and data, should accomplish some well-defined tasks.
+        \item \textbf{Interfaces}: How components communicate with each other.
+        \item \textbf{Data Structures}: Suitable data structures for storing and managing data.
+        \item \textbf{Algorithms} required to implement individual components.
+    \end{enumerate}
+    \item Characterizing a Good Software Design
+    \begin{enumerate}
+        \item \textbf{Correctness}: Correctly implement all the functionalities of the system.
+        \item \textbf{Efficiency}: Ensure that resources, time, space, cost, are managed well.
+        \item \textbf{Maintainability}: Easy to Change
+        \item \textbf{Understandable} by everyone in the development team.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Design Modularity}
+\begin{itemize}
+    \item When all functions in a module perform a single objective, the module is said to have good cohesion.
+    \item \textbf{Coupling}: Measure of the degree of interaction between two modules.
+    \item \textbf{Cohesion}: Measure of how functions in a module cooperate together to perform a single objective.
+    \item A good design will have high cohesion and low coupling.
+    \item \textbf{Modular}: Problem has been decomposed into a set of modules that have only limited interactions with each other.
+    \item \textbf{High cohesion}: Functions of the module cooperate with each other for performing a single objective.
+    \item Two modules are \textbf{data coupled} if their communication is using a primitive data type.
+    \item \textbf{Control Coupling}: Data is passed that influence the internal logic of a module.
+    \item \textbf{Common Coupling}: If two modules share global data items.
+    \item \textbf{Content Coupling}: If one module refers to the internals of the other module.
+    \item \textbf{Functional Cohesion}: Different functions of the module cooperate to complete a single task.
+    \item \textbf{Sequential Cohesion}: Different functions of the module execute in a sequence. Output from one function is input to next in the sequence.
+    \item \textbf{Communicational Cohesion}: If all functions of the module refer to or update the same data structure.
+    \item \textbf{Procedural Cohesion}: Activities in the module are related by sequence. Set of functions in the module are expected one after the other, work towards entirely different purposes.
+    \item \textbf{Coincidental Cohesion}: Module has functions with meaningless relationships with one another.
+\end{itemize}
+
+\subsection{Object-Oriented Design}
+\begin{itemize}
+    \item \textbf{Object} are key building blocks. Working of a software in terms of interacting objects. Usually represent a tangible real-world entity.
+    \item An object contains data, methods, and they follow encapsulation. This ensures data hiding/abstraction.
+    \item \textbf{Class} are template for object creation. All objects possessing similar attributes and methods constitute a class.
+    \item \textbf{Association}: Take each other's help to perform some functions.
+    \item \textbf{Composition}: Represents whole/part relationships.
+    \item \textbf{Inheritance}: Extend features of an existing class.
+    \item \textbf{Dependency}: If class B depends on class A, if any changes are made to class A, changes have to be made to class B as well.
+\end{itemize}
+
+\subsection{Unified Modelling Language Diagrams}
+\begin{itemize}
+    \item \textbf{Modelling}: Creating an external, explicit representation of the system to be built.
+    \item \textbf{UML} help represent the software design via multiple views and greater level of detail.
+    \item \textbf{Structural View}: Structure/components of the software system, and relationships. It describes logical parts of the system, i.e., classes, data, and functions.
+    \item \textbf{Class Diagram}: Describes the structure of the system. Describes the system's classes, attributes, operations, relationships among objects.
+    \item \textbf{Dynamic Behavioral View}: Describes behavior of the system over time. Further classified into
+    \begin{enumerate}
+        \item \textbf{State Machine View}: Models different states of an object of a class.
+        \item \textbf{Activity View}: Models flow of control among computational activities.
+        \item \textbf{Interaction View}: Sequence of message exchanges among parts of a system.
+    \end{enumerate}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/SE_sequence_diagram.png}
+        \caption{Sequence Diagram for adding seller using Interaction View}
+    \end{figure}
+    \item \textbf{Purposes of Modelling}
+    \begin{enumerate}
+        \item Serves as a vehicle for communication and idea generation.
+        \item Guide Development of software
+        \item Close correspondence with the implementation. Generate code from models.
+    \end{enumerate}
+    \item \textbf{VeriSIM}: \textbf{Veri}fying designs by \textbf{Sim}ulating Scenarios. Develop an integrated understanding of class and sequence diagrams.
+    \item \textbf{Design Tracing Strategy}: Construct a state diagram which models the scenario.
+\end{itemize}
 
 \end{document}

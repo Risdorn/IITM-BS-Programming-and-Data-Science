@@ -644,4 +644,74 @@ Software Testing
     \end{figure}
 \end{itemize}
 
+\section{Logic}
+\subsection{Basics}
+\begin{itemize}
+    \item The fragment of logic that we consider is popularly known as \textbf{predicate logic} or \textbf{first order logic}.
+    \item An \textbf{atomic proposition} is a term that is either \textbf{true} or \textbf{false}.
+    \item Propositional logic deals with combining propositions using \textbf{logical connectives} to form \textbf{formulas} which are complicated statements.
+    \item Common logical connectives used in proportional logic are
+    \begin{enumerate}
+        \item $\lor$ Disjunction
+        \item $\land$ conjunction
+        \item $\neg$ negation
+        \item $\supset$ or $\implies$ implies
+        \item $\equiv$ or $\iff$ equivalence
+    \end{enumerate}
+    \item The set $\phi$ of formulas of propositional logic is the smallest set satisfying the following conditions
+    \begin{enumerate}
+        \item All atomic propositions is a member of $\phi$
+        \item If $\alpha$ is a member of $\phi$, so is $\neg \alpha$
+        \item If $\alpha$ and $\beta$ are members of $\phi$ so is $\alpha \lor \beta$
+    \end{enumerate}
+    \item Truth tables are a simple way of calculating the semantics of a given propositional logic formula.
+    \item We \textit{split} a formula into its \textbf{sub-formulas} repeatedly till we \textit{reach} propositions.
+    \item A formula $\alpha$ is said to be \textbf{satisfiable} if there exists a valuation $v$ such that $v(\alpha)=T$.
+    \item A formula of $\alpha$ is to be \textbf{valid} or is called a \textbf{tautology} if for every valuation it gives True.
+    \item A formula of $\alpha$ is said to be a \textbf{contradiction} if for every valuation it gives False.
+    \item Atomic propositions in propositional logic are just like variables that are of type \textbf{Boolean}.
+    \item A \textbf{predicate} is an expression that evaluates to a Boolean value.
+    \item A \textbf{clause} is a predicate that does not contain any logical operators.
+\end{itemize}
+
+\subsection{Coverage Criteria}
+\begin{itemize}
+    \item Let $P$ be a set of predicates and $C$ be a set of clauses in the predicates in $P$.
+    \item For each predicate $p\in P$, let $C_p$ be the clauses in $p$. $C_p\{c|c\in p\}$
+    \item \textbf{Predicate Coverage}: For each $p\in P$, TR contains two requirements: $p$ evaluates to true and $p$ evaluates to false.
+    \item For a set of predicates associated with branches, predicate coverage is the same as edge coverage.
+    \item \textbf{Clause Coverage}: For each $c\in C$, TR contains two requirements: $c$ evaluates to true and $c$ evaluates to false.
+    \item Clause coverage \textbf{does not} subsume predicate coverage.
+    \item \textbf{Combinatorial Coverage}: For each $p\in P$, TR contains test requirements for the clauses in $C_p$ to evaluate to each possible combination of truth values. Commonly called as \textbf{multiple condition coverage}.
+    \item Combinatorial coverage in many times not feasible.
+    \item Sometimes, the truth of certain clauses in predicate makes the other clauses non-influential on the predicate.
+    \item At a given point in time, we are interested in one clause in a predicate, we call this the \textbf{major clause}. All other clauses are \textbf{minor clauses}.
+    \item  Given a major clause $c_i$ in predicate $p$, we say that $c$ \textbf{determines} $p$ if the minor clauses $c_j\in C_p$, $j\neq i$, have values so that changing the truth values of $c_i$ changes the truth value of $p$. 
+    \item \textbf{Active Clause Coverage}: For each $p\in P$ and each major clause $c_i\in C_p$, choose minor clauses $c_j, j\neq i$, so that $c_i$ determines $p$. TR has requirements for each clause as a major clause. For a predicate with $n$ clauses, $n+1$ distinct test requirements suffice to achieve clause coverage.
+    \item \textbf{Modified Condition Decision Coverage(MCDC)} is the same as Active Clause Coverage.
+    \item \textbf{General Active Clause Coverage}: TR has two requirements for each $c_i$, $c_i$ evaluates to true and evaluates to false. The values chosen for the minor clauses $c_j$ do not need to be the same when $c_i$ is true as when $c_i$ is false. GACC \textbf{does not} subsume predicate coverage.
+    \item \textbf{Correlated Active Clause Coverage}: The values chosen for minor clauses $c_j$ must cause $p$ to be true for one value of the major clause $c_i$ and false for the other. CACC subsumes predicate coverage.
+    \item \textbf{Restricted Active Clause Coverage}: The values chosen for the minor clauses $c_j$ must be the same when $c_i$ is true and when it is false.
+    \item \textbf{Inactive Clause Coverage}: For each $p\in P$ and each major clause $c_i\in C_p$, choose minor clauses $c_j, j\neq i$ so that $c_i$ does not determine $p$. TR now has four requirements for $c_i$, $p$ is true/false for $c_i$ true/false.
+    \item \textbf{General Inactive Clause Coverage}: The values chosen for the minor clauses $c_j$ may vary amongst the four cases.
+    \item \textbf{Restricted Inactive Clause Coverage}: The values chosen for the minor clauses $c_j$ must be the same for same values of $p$.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/ST_logic_subsume_summary.png}
+        \caption{Logic Coverage Criteria Subsumption Summary}
+    \end{figure}
+    \item As long as a predicate or a clause is not valid/not a contradiction, we can find test cases to achieve predicate and clause coverage.
+    \item Need to identify the \textbf{correct} predicates and pass them to a \textbf{SAT/SMT solver} to check if the predicate is \textbf{satisfiable}.
+    \item Making a clause determine a predicate
+    \begin{enumerate}
+        \item Consider a predicate $p$ with a major clause $c$
+        \item Let $p_{c=true}$ represent the predicate $p$ with every occurrence of $c$ replaced with $true$, and $p_{c=false}$.
+        \item Note that neither $p_{c=true}$ nor $p_{c=false}$ contains any occurrence of $c$.
+        \item Define $p_c=p_{c=true}\oplus p_{c=false}$, $\oplus$ represents the exclusive or operator.
+        \item $p_c$ describes the exact conditions under which the value of $c$.
+        \item If $p_c$ is true then $c$ determines $p$ and if $p_c$ is false then $p$ is independent of $c$.
+    \end{enumerate}
+    \item For a predicate $p$ where the value of $p_c$ for a clause $c$ turns out to be true, then ICC criteria are infeasible with respect to $c$. Similarly, if $p_c$ turns out to be false, ACC criteria are infeasible.
+\end{itemize}
+
 \end{document}

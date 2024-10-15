@@ -736,6 +736,108 @@ Deep Learning
     \item In practice, often a line search is done to find a relatively better value of $\eta$. Update $w$ using different values of $\eta$ then pick the best $w$ based on loss function.
 \end{itemize}
 
-%\section{Gradient Descent with Adaptive Learning Rates}
+\section{Adaptive Learning Rates}
+\begin{itemize}
+    \item \textbf{Intuition}: Decay the learning rate for parameters in proportion to their update history(more updates means more decay).
+    \item Update rule for \textbf{AdaGrad}
+    \begin{equation*}
+        \begin{split}
+            &v_t = v_{t-1} + (\nabla w_t)^2\\
+            &w_{t+1} = w_t - \frac{\eta}{\sqrt{v_t+\epsilon}}\times \nabla w_t
+        \end{split}
+    \end{equation*}
+    and similar set of equations for $b_t$.
+    \item \textbf{Intuition}: AdaGrad decays the learning rate very aggressively(as the denominator grows). As a result, after a while, the frequent parameters will start receiving very small updates. To avoid this we can decay the denominator.
+    \item Update rule for \textbf{RMSprop}
+    \begin{equation*}
+        \begin{split}
+            &v_t = \beta v_{t-1} + (1-\beta)(\nabla w_t)^2\\
+            &w_{t+1}=w_t-\frac{\eta}{\sqrt{v_t+\epsilon}}\times \nabla w_t
+        \end{split}
+    \end{equation*}
+    Give lower and lower weightage to previous gradients
+    \item RMSprop converges more quickly than AdaGrad by being less aggressive on decay.
+    \item In RMSprop, the deltas start oscillating after a while, learning rate can increase, decrease or remain constant. Whereas in AdaGrad learning rate can only decrease as the denominator constantly grows.
+    \item In case of oscillations, setting $\eta_0$ properly could solve the problem.
+    \item Both are \textbf{sensitive} to initial learning rate, initial conditions of parameters and corresponding gradients.
+    \item \textbf{AdaDelta} avoids setting initial learning rate $\eta_0$
+    \begin{equation*}
+        \begin{split}
+            &v_t = \beta v_{t-1} + (1-\beta)(\nabla w_t)^2\\
+            &\Delta w_t = -\frac{\sqrt{u_{t-1}+\epsilon}}{\sqrt{v_t+\epsilon}}\nabla w_t\\
+            &w_{t+1} = w_t+\Delta w_t\\
+            &u_t = \beta u_{t-1}+(1-\beta)(\Delta w_t)^2
+        \end{split}
+    \end{equation*}
+    Now the numerator, in the effective learning rate, is a function of past gradients. Observe that the $u_t$ that we compute at $t$ will be used only in the next iteration. Essentially one history runs behind the other.
+    \item After some $i$ iterations, $v_t$ will start decreasing and the ratio of the numerator to the denominator starts increasing. If the gradient remains low for a subsequent time steps, then the learning rate grows accordingly.
+    \item Therefore, AdaDelta allows the numerator to increase or decrease based on the current and past gradients.
+    \item \textbf{Intuition}: Do everything that RMSprop does to solve the decay problem of AdaGrad, plus used a cumulative history of the gradients.
+    \item Update rule for \textbf{Adam(Adaptive Moments)}
+    \begin{equation*}
+        \begin{split}
+            &m_t = \beta_1m_{t-1}+(1-\beta_1)\nabla w, \text{   }\hat{m}_t = \frac{m_t}{1-\beta_1^t}\gets \text{Incorporating classical momentum}\\
+            &v_t = \beta_2v_{t-1}+(1-\beta_2)(\nabla w_t)^2, \text{   }\hat{v}_t = \frac{v_t}{1-\beta_2^t}\\
+            &w_{t+1} = w_t - \frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t
+        \end{split}
+    \end{equation*}
+    Note that we are taking a running average of the gradients as $m_t$.
+    \item One way of looking at this is that we are interested in the expected value of the gradient and not on a single point estimate computed at time $t$.
+    \item $\hat{m}_t$ and $\hat{v}_t$ are bias correction terms, we do this to avoid very high learning rate update. It can also be derived by taking expectation of $m_t$.
+    \item Bias correction is the problem of exponential averaging.
+    \item General form of $L^p$ norm is $(|x_1|^p+|x_2|^p+...+|x_n|^p)^{\frac{1}{p}}$, as $p\to \infty$, $L^p$ boils down to taking the max value.
+    \item In Adam, we called $\sqrt{v_t}$ as $L^2$ norm, why not replace it with $L^{\infty}$ norm. Therefore, we have
+    \begin{equation*}
+        \begin{split}
+            &v_t = \max(\beta_2^{t-1}|\nabla w_1|, \beta_2^{t-2}|\nabla w_2|, ..., |\nabla w_t|)\\
+            &v_t = \max(\beta_2v_{t-1}, |\nabla w_t|)\\
+            &w_{t+1} = w_t-\frac{\eta_0}{v_t}\nabla w_t
+        \end{split}
+    \end{equation*}
+    Observe that we didn't use bias corrected $v_t$ as max norm is not susceptible to initial zero bias.
+    \item Suppose that we initialize $w_0$ such that the gradient at the $w_0$ is high. Suppose further that the gradients for the next subsequent iterations are also zero because $x$ is sparse. Ideally, we don't want the learning rate to change its value when $\nabla w_t=0$.
+    \item Update Rule for \textbf{MaxProp} is similar to RMSprop
+    \begin{equation*}
+        \begin{split}
+            &v_t = \max(\beta v_{t-1}, |\nabla w_t|)\\
+            &w_{t+1} = w_t - \frac{\eta}{v_t+\epsilon}\nabla w_t
+        \end{split}
+    \end{equation*}
+    \item We can extend the same idea to Adam and call it \textbf{AdaMax}
+    \begin{equation*}
+        \begin{split}
+            &m_t = \beta_1m_{t-1} + (1-\beta_1)\nabla e_t,\text{   }\hat{m}_6 = \frac{m_t}{1-\beta_1^t}\\
+            &v_t = \max(\beta_2v_{t-1}, |\nabla w_t|)\\
+            &w_{t+1} = w_t-\frac{\eta}{v_t+\epsilon}\hat{m}_t
+        \end{split}
+    \end{equation*}
+    \item \textbf{Intuition}: We know NAG is better than momentum based GD, why not just incorporate it with Adam.
+    \item We can rewrite NAG such that there is no $t-1$ term, as
+    \begin{equation*}
+        \begin{split}
+            &g_{t+1} = \nabla w_t\\
+            &m_{t+1} = \beta m_t + \eta g_{t+1}\\
+            &w_{t+1} = w_t - \eta(\beta m_{t+1} + g_{t+1})
+        \end{split}
+    \end{equation*}
+    \item Update rule for \textbf{NAdam(Nesterov Adam)}
+    \begin{equation*}
+        \begin{split}
+            &m_t = \beta_1m_{t-1}+(1-\beta_1)\nabla w, \text{   }\hat{m}_t = \frac{m_t}{1-\beta_1^t}\\
+            &v_t = \beta_2v_{t-1}+(1-\beta_2)(\nabla w_t)^2, \text{   }\hat{v}_t = \frac{v_t}{1-\beta_2^t}\\
+            &w_{t+1} = w_t - \frac{\eta}{\sqrt{\hat{v}_{t+1}}+\epsilon}(\hat{m}_{t+1}+\frac{(1-\beta_1)\nabla w_t}{1 - \beta_1^{t+1}})
+        \end{split}
+    \end{equation*}
+    \item It is common for new learners to start out using off the shelf optimizers, which are later replaced by custom designed ones.
+    \item \textbf{Cyclical Learning Rate}: Suppose the loss surface has a saddle point. Suppose further that the parameters are initialized, and the learning rate is decreased exponentially. After some iterations, the parameters will reach near the saddle point. Since, the learning rate has decreased exponentially, the algorithm has no way of coming out of the saddle point.\\
+    What if we allow the learning rate to increase after some iterations.
+    \item \textbf{Rationale}: Often, difficulty in minimizing the loss arises from saddle points rather than poor local minima.
+    \item A simple way to solve this is to vary the learning rate cyclically. One example is triangular learning rate.
+    \item \textbf{Cosine Annealing(Warm Re-Start)}: also based on cyclical learning rate
+    \begin{equation*}
+        \eta_t = \eta_{min} + \frac{\eta_{max}-\eta_{min}}{2}(1+\cos(\pi \frac{t\%(T+1)}{T})), \text{ }T\text{ is restart interval}
+    \end{equation*}
+    \item \textbf{Warm-start}: Using a low initial learning rate helps the model to warm and converge better.
+\end{itemize}
 
 \end{document}

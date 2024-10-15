@@ -693,4 +693,101 @@ Very often to escape local minima we use Stochastic/Randomized methods instead o
     where $\rho$ is the rate of evaporation of pheromone.
 \end{itemize}
 
+\section{Finding Optimal TSP Tours}
+\subsection{Finding Optimal Paths}
+\begin{itemize}
+    \item Breadth First Search finds a solution with the smallest \textit{number} of moves. But if \textit{cost} of all moves is no the same then an \textbf{optimal} solution may not be the one with the smallest number of moves.
+    \item \textbf{Brute Force}: Simply search the entire search tree, computationally it is mindlessly expensive.
+    \item \textbf{Goal}: Search as little of the space as possible while guaranteeing the optimal solution.
+    \item A \textit{Best First} approach to solving problems. Given a set of candidates a search algorithm has to choose from. Each candidate is tagged with an estimated cost of the complete solution.
+    \item Branch and Bound in a refinement space
+    \begin{enumerate}
+        \item Initial solution set contains all solutions.
+        \item In each step we partition a set into two smaller sets.
+        \item Until we can pick a solution that is fully specified.
+        \item Each solution set needs to have an estimated cost.
+        \item B\&B will refine the solution that has the least estimated cost.
+    \end{enumerate}
+    \item An optimal solution can be guaranteed by ensuring that the estimated cost is a lower bound on actual cost.
+    \item \textbf{Lower bound}: A solution will never be cheaper than it is estimated to be.
+    \item Thus if a fully refined solution is cheaper than a partially refined one, the latter need not be explored - \textbf{PRUNING}. The higher the estimate, the better the pruning.
+    \item Branch and Bound for TSP
+    \begin{enumerate}
+        \item Let the candidate solutions be permutations of the list of city names.
+        \item The initial set of candidates includes all permutations.
+        \item Refine the cheapest set by specifying a specific segment.
+        \item Heuristic: Choose the segment with minimum cost.
+        \item For tighter estimates, edges that cause three or more segment cycles are avoided.
+        \item We, can also exclude an edge that is a third edge for a node, because a city has only two neighbors in a tour.
+        \item Higher estimates require more work.
+    \end{enumerate}
+    \item A lower bound estimate could be for each row add up the smallest two positive entries and divide by two. This may not feasible.
+    \item The basic idea behind B\&B is to prune those parts of a search space which cannot contain a better solution.
+    \item Each candidate is tagged with an estimated cost of the complete solution.
+    \item \textbf{Dijkstra's Algorithm}
+    \begin{enumerate}
+        \item Begins by assigning infinite cost estimates to all nodes except the start node.
+        \item It assigns color white to all the nodes initially.
+        \item It picks the cheapest white node and colors it black.
+        \item \textbf{Relaxation}: Inspect all neighbors of the new black node and check if a cheaper path has been found to them.
+        \item If yes, then update cost of that node, and mark the  parent node.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Algorithm A*}
+\begin{itemize}
+    \item A* achieves better performance by using heuristics to guide its search.
+    \item For all nodes we will compute $f(n)$ which is made up of two components $g(n)$ and $h(n)$.
+    \item $g(n)$ = actual cost of solution found from the start node to node $n$.
+    \item $h(n)$ = estimated cost of the path from node $n$ to goal node.
+    \item Maintain a priority queue of nodes sorted on the $f$ values
+    \item Pick the lowest $f$ value node, and check whether it is the goal node.
+    \item Else generate its neighbors, and compute their $f$ values
+    \item Insert new nodes into the priority queue
+    \item For existing nodes check for better path(like Dijkstra's algorithm)
+    \begin{algorithm}[H]
+        \caption{A* Algorithm}\label{alg:AI-A*}
+        \begin{algorithmic}[1]
+            \Statex \Call{A*}{S}
+            \State default value of $g$ for every node is $+\infty$
+            \State $parent(S)\gets null$
+            \State $g(S)\gets 0$
+            \State $f(S)\gets g(S)+h(S)$
+            \State $OPEN\gets$ $S:$[ ]
+            \State $CLOSED\gets$ empty list
+            \While{$OPEN$ is not empty}
+                \State $N\gets$ remove node with the lowest $f$ value from $OPEN$
+                \State add $N$ to CLOSED
+                \If{\Call{GoalTest}{$N$}}
+                    \State \Return \Call{ReconstructPath}{$N$}
+                \EndIf
+                \For{each neighbor $M\in $ \Call{MoveGen}{$N$}}
+                    \If{$g(N)+k(N,M)<g(M)$}
+                        \State $parent(M)\gets N$
+                        \State $g(M)\gets g(N)+k(N,M)$
+                        \State $f(M)\gets g(M)+h(M)$
+                        \If{$M\in OPEN$} 
+                            \State continue 
+                        \EndIf
+                        \If{$M\in CLOSED$} 
+                            \State \Call{Propagate-Improvement}{$M$}
+                        \Else 
+                            \State add $M$ to $OPEN$ 
+                        \EndIf
+                    \EndIf
+                \EndFor
+            \EndWhile
+            \Return empty list
+        \end{algorithmic}
+    \end{algorithm}
+    \item Propagate improvement simply does line 13 to 17 recursively.
+    \item A* is admissible if
+    \begin{enumerate}
+        \item The branching factor is finite, otherwise you cannot even generate the neighbors.
+        \item Every edge has a cost greater than a small constant $\epsilon$, however it is possible to get stuck in an infinite path with a finite cost.
+        \item For all nodes $h(n)\leq h*(n)$
+    \end{enumerate}
+    \item If a path exists to the goal node, then the OPEN list always contains a node $n'$ from an optimal path. Moreover, the $f$ value of that node is not greater than the optimal value.
+\end{itemize}
+
 \end{document}
