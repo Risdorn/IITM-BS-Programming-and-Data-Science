@@ -123,6 +123,3 @@ def main():
     print("Random Walk:", best)
     best = simulatedAnnealing(state, blocks.MoveGen, blocks.heuristic1, 100, 0.99, kind="max", epochs=10, iterations=50)
     print("Simulated Annealing:", best)
-
-if __name__ == "__main__":
-    main()

@@ -104,6 +104,3 @@ def main():
     print("Simple Search 2 with a graph with no path to goal:", SimpleSearch2(G1.start, G1.MoveGen, G1.GoalTest))
     print("Simple Search 1 with a graph with loops:", SimpleSearch1(G2.start, G2.MoveGen, G2.GoalTest))
     print("Simple Search 2 with a graph with loops:", SimpleSearch2(G2.start, G2.MoveGen, G2.GoalTest))
-
-if __name__ == "__main__":
-    main()

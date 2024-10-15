@@ -321,6 +321,3 @@ def main():
     B = BlockTower(start, goal)
     print("Hill Climbing Search with BlockTower:")
     print(HillClimbing(B.start, B.MoveGen, B.heuristic1, "max"))
-
-if __name__ == "__main__":
-    main()

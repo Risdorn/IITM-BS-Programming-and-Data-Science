@@ -269,5 +269,3 @@ def main():
         print("Result path:", path)
         sys.stdout = sys.__stdout__
     
-if __name__ == "__main__":
-    main()

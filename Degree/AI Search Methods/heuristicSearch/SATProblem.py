@@ -51,6 +51,3 @@ def main():
     print()
     bestNode = BeamSearch(S, SAT.MoveGen, SAT.GoalTest, SAT.Heuristic, 2, "max")
     print("Best Node:", bestNode)
-
-if __name__ == "__main__":
-    main()

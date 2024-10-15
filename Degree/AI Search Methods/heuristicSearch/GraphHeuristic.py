@@ -121,6 +121,3 @@ def main():
         print("Savings Tour:", TSP.savingsTour(0), "Cost:", TSP.TourCost(TSP.savingsTour(0)))
         print("Greedy Tour:", TSP.computeGreedyTour(), "Cost:", TSP.TourCost(TSP.computeGreedyTour()))
         sys.stdout = sys.__stdout__
-
-if __name__ == "__main__":
-    main()

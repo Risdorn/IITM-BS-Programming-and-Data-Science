@@ -221,6 +221,6 @@ def BlockTowerTest():
         
     #print(blockTower.heuristic2(W))
 
-if __name__ == "__main__":
+def main():
     #eightTilesTest()
     BlockTowerTest()

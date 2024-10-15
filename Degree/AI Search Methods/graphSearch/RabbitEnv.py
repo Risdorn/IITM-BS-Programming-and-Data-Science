@@ -70,6 +70,3 @@ def main():
     print("Unique States", uniqueStates)
     print("Number of Unique States", len(uniqueStates))
     
-
-if __name__ == "__main__":
-    main()

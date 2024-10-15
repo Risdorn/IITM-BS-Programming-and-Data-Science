@@ -161,6 +161,5 @@ def TSPtest():
     savingsTours = TSP.savingsTour(1)
     print("Savings Tour:", savingsTours, "Cost:", TSP.TourCost(savingsTours))
     
-
-if __name__ == "__main__":
+def main():
     TSPtest()
