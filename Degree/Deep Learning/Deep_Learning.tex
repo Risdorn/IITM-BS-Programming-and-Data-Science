@@ -217,7 +217,7 @@ Deep Learning
         \begin{subfigure}[b]{0.45\textwidth}
             \includegraphics[width=0.8\textwidth]{Degree//static/DL_classical_perceptron.png}
             \caption{Perceptron}
-            \label{fig:DL-perceptron}
+            \label{fig:DL-perceptron-1}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.45\textwidth}
@@ -838,6 +838,821 @@ Deep Learning
         \eta_t = \eta_{min} + \frac{\eta_{max}-\eta_{min}}{2}(1+\cos(\pi \frac{t\%(T+1)}{T})), \text{ }T\text{ is restart interval}
     \end{equation*}
     \item \textbf{Warm-start}: Using a low initial learning rate helps the model to warm and converge better.
+\end{itemize}
+
+\section{Regularization}
+\subsection{Introduction to Bias and Variance}
+\begin{itemize}
+    \item Deep learning models typically have BILLIONS of parameters whereas the training data may have only MILLIONS of samples. Therefore, they are called \textbf{over-parameterized} models.
+    \item Over-parameterized models are \textbf{prone} to a phenomenon called \textbf{over-fitting}.
+    \item Simple models trained on different samples of the data do not differ much from each other. However, they are very far from the true sinusoidal curve (\textbf{under fitting}).
+    \item \textbf{Bias}: Difference between the expected value of predictions subtracted by the true value.
+    \begin{equation*}
+        \text{Bias }\Hat{f}(x)=E[\Hat{f}(x)]-f(x)
+    \end{equation*}
+    Simple models will have high bias and complex models will have low bias.
+    \item Variance is defined as
+    \begin{equation*}
+        \text{Variance }\Hat{f}(x)=E[(\Hat{f}(x)-E[\Hat{f}(x)])^2]=E[\Hat{f}^2(x)]-E[\Hat{f}(x)]^2
+    \end{equation*}
+    Roughly speaking it tells us how much the different $\Hat{f}(x)'s$ trained on different samples of the data differ from each other. Simple models have a low variance whereas complex model have a high variance.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+             & Bias & Variance \\
+             \hline
+            Simple Model & High & Low \\
+            \hline
+            Complex Model & Low & High \\
+            \hline
+        \end{tabular}
+    \end{table}
+    \item There is always a trade-off between the bias and variance. Both contribute to the MSE loss.
+    \item Consider a new point $(x,y)$ which was not seen during training. If we use the model $\Hat{f}(x)$ to predict the value of $y$ then the mean squared error is given by $E[(y-\Hat{f}(x))^2]$ (MSE), we can show that
+    \begin{equation*}
+        E[(y-\Hat{f}(x))^2]=\text{ Bias}^2+\text{ Variance }+\sigma^2\text{ (irreducible error)}
+    \end{equation*}
+    \item The parameters of $\Hat{f}(x)$ are trained using a training set. However, at test time we are interested in evaluating the model on a validation(unseen) set which was not used for training. This gives rise to two entities $train_{err}$ and $test_{err}$. Typically, this gives rise to the following graph, parabola represents test error.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/DL_train_vs_test.png}
+        \caption{Train vs Test Error}
+        \label{fig:DL-train-vs-test}
+    \end{figure}
+    \item Complex model is more sensitive to minor changes in the data, as compared to simple models. Hence while training, instead of minimizing the training error we should minimize train error $+\Omega(\theta)$, which is high for complex models and small for simple models.
+    \item This is the basis for all the regularization methods.
+\end{itemize}
+
+\subsection{Regularization Methods}
+\begin{itemize}
+    \item For \textbf{L2 Regularization} define the loss as
+    \begin{equation*}
+        \Bar{L}(w)=L(w)+\frac{\alpha}{2}\lVert w\rVert^2
+    \end{equation*}
+    and the following gradient would look like
+    \begin{equation*}
+        \nabla \Bar{L}(w)=\nabla L(w)+\alpha w
+    \end{equation*}
+    So it is very easy to implement this.
+    \item It essentially makes it, so the weights are closer to $0$, non-essential weights will be closer to $0$ as compared to essential weights.
+    \item \textbf{Data Augmentation}: Consider images, rotate them, shift them, blur them, change some pixels, etc.
+    \item We exploit the fact that certain transformations to the image do not change the label of the image.
+    \item Typically, more data = better learning.
+    \item Augmentation works well for image classification/object recognition tasks.
+    \item It has been shown, that it works well for speech as well.
+    \item \textbf{Parameter Sharing} is used in CNNs, essentially same filter is applied at different positions of the image, or same weight matrix acts on different input neurons.
+    \item This is typically used in autoencoders, encoder and decoders.
+    \item \textbf{Injecting Noise at input}: We can show that for a simple input output neural network, adding Gaussian noise to the input is equivalent to weight decay(L2 regularization).
+    \item We essentially shift the input by a slight amount at every epoch, so the model sees a different input at every epoch making it harder to over fit.
+    \item This can also be viewed as data augmentation.
+    \item We can similarly inject noise at output as well.
+    \item \textbf{Early stopping}: Have a patience parameter $p$, after $p$ steps if validation error does not decrease then we stop and return the model $p$ steps before.
+    \item This is very effective and widely used, it can be used even with other regularizers.
+    \item \textbf{Ensemble Methods}: Combine the output of different models to reduce generalization error. These models can correspond to different classifiers, it could be different instances of the same classifier trained with different hyperparameters, features, samples etc.
+    \item \textbf{Bagging}: Form an ensemble using different instances of the same classifier. For a given dataset, construct multiple training sets by sampling with replacement.
+    \item Bagging would work well when the errors of the model are independent or uncorrelated, if they are correlated then the mse of the ensemble is as bad as the individual model.
+    \item On average, the ensemble will perform at least as well as its individual members.
+    \item Training several neural networks for making an ensemble is prohibitively expensive.
+    \item \textbf{Dropout}: Refers to dropping out units, temporarily remove a node and all its incoming and outgoing connections resulting in a thinned network.
+    \item Each node is retained with a fixed probability, $p=0.5$, for hidden nodes and $p=0.8$ for visible nodes.
+    \item We initialize all the parameters of the network and start training. For the first training instance(or mini-batch), we apply dropout resulting in the thinned network. Then update only those parameters that are active.
+    \item For the second training instance, we again apply dropout resulting in a different thinned network. We again compute the loss and back propagate.
+    \item Each thinned network gets rarely trained but the parameter sharing ensures that no model has untrained or poorly trained parameters.
+    \item Dropout essentially applies a masking noise to the hidden units. Prevents hidden units from coadapting.
+\end{itemize}
+
+\section{Deep Learning Revival}
+\subsection{Unsupervised Pre-Training}
+\begin{itemize}
+    \item We will first train the weights between the layers using an \textbf{unsupervised objective}, essentially we will try to reconstruct $x$.
+    \item If we are able to do this, it would mean that the hidden layers are capturing all the important information of the image. We will be learning one layer at a time.
+    \item $h_1$ will try to reconstruct $x$, $h_2$ will try to reconstruct $h_1$, and so on...
+    \item After this layerwise pre-training, we add the output layer and train the whole network.
+    \item In effect we have initialized the weights of the network using the greedy unsupervised objective and are now fine-tuning these weights using the supervised objective.
+    \item This helps in optimization and regularization.
+    \item Unsupervised objective ensures that the learning is not greedy w.r.t the supervised objective.
+    \item Some other experiments have also shown that pre-training is more robust to random initializations.
+    \item This led to people thinking that deep networks are sensitive to initial weights, and maybe if we have better initial weights it would lead to better network.
+\end{itemize}
+
+\subsection{Better Activation Functions}
+\begin{itemize}
+    \item \textbf{Sigmoid}: $\sigma(x)=\frac{1}{1+e^{-x}}$, compresses all its inputs to the range $[0,1]$. $\frac{\partial \sigma(x)}{\partial x}=\sigma(x)(1-\sigma(x))$, once sigmoid neuron is \textbf{saturated}($\sigma(x)=0$ or $1$) then the training will halt as the derivative would become zero.\\
+    Another issue is that sigmoid are \textbf{not zero centered}, leading to all positive or all negative gradients, lack of diversity. These are also \textbf{computationally expensive} because of the exponential term.
+    \item \textbf{tanh}: $tanh(x)$, compresses all its input to the range $[-1,1]$ so, its \textbf{zero centered}.$\frac{\partial tanh(x)}{\partial x}=(1-tanh^2(x))$, but we still face the issue of \textbf{vanishing gradient}, and it is still \textbf{computationally expensive}.
+    \item \textbf{Rectified Linear Unit}: $ReLU(x)=\max{(0,x)}$, does not saturate in the positive region, it is computationally efficient and in practice converges much faster than sigmoid and tanh.\\
+    Clearly the derivative is $1$ for $x>0$ and $0$ otherwise, leading to no updates for negative neurons, which makes the neuron dead.\\
+    In practice a large fraction of ReLU units can die if the learning rate is set too high.\\
+    It is advised to initialize the bias to a positive value.
+    \item \textbf{Leaky ReLU}: $f(x)=\max{(0.1x,x)}$, no saturation, computationally efficient, close to zero centered outputs, and will not die.
+    \item \textbf{Parametric ReLU}: $f(x)=\max{(\alpha x,x)}$, $\alpha$ can be learned.
+    \item \textbf{Exponential Linear Unit}: $ELU=\begin{cases}
+        x\text{ if }x>0\\ ae^x-1\text{ if }x\leq 0
+    \end{cases}$, close to zero centered outputs, expensive.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_Sigmoid_function.png}
+            \caption{Sigmoid Function}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_tanh_function.png}
+            \caption{Tanh Function}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_ReLU_function.png}
+            \caption{ReLU Function}
+        \end{subfigure}
+        \caption{Activation Functions - 1}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_Leaky_ReLU_function.png}
+            \caption{Leaky ReLU Function}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_Leaky_ReLU_function.png}
+            \caption{Parametric ReLU Function}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_ELU_function.png}
+            \caption{ELU Function}
+        \end{subfigure}
+        \caption{Activation Functions - 2}
+    \end{figure}
+    \item \textbf{Model Averaging}: Train $k$ models with independent weights($w_1,w_2,...,w_k$) on independently sampled data points from the original dataset. Each model is expected to be good at predicting a subset of training samples well.\\
+    During inference, the prediction is done by averaging the predictions from all the models, it is often \textbf{arithmetic or geometric} mean for regression problems.
+    \item In bagging, the subset of training samples seen by each of the models does not change across epochs. Therefore, the model weights get optimized for those samples.
+    \item Each sub-model sees only some parts of the training data, therefore we want updates to be larger.
+    \item We don't have this luxury in case of dropout.
+    \item \textbf{MaxOut}: In a way is a variation of Dropout, but instead of having probability, we take say 3 neurons in a layer and propagate the max of them. Can also be thought of as a generalization of ReLU and Leaky ReLU.\\
+    Two MaxOut neurons with sufficient number of affine transformations, act as a universal approximator.
+    \item \textbf{Gaussian Error Linear Unit}: $GELU=mx$ where $m\sim Bernoulli(\Phi(x))$
+    \item \textbf{Swish}: $x\sigma(\beta x)$, taking $\beta=1.702$ we get GELU, and taking $1$ we get SILU(Sigmoid-weighted Linear Unit).
+\end{itemize}
+
+\section{Convolutional Neural Networks}
+\begin{itemize}
+    \item Convolution operation can be defined as
+    \begin{equation*}
+        x\ast w=\sum_{a=0}^{\infty}x(t-a)w(a)=\sum_{a=0}^{\infty}x(a)w(t-a)
+    \end{equation*}
+    where $w$ is called a filter and $x$ is the input.
+    \item Similarly 2D convolution operation can be defined as
+    \begin{equation*}
+        (I\ast K)(i,j)=\sum_{a=0}^{m-1}\sum_{b=0}^{n-1}I(i-a,j-a)K(a,b)
+    \end{equation*}
+    We can use this for images.
+    \item We can define correlation operator as
+    \begin{equation*}
+        g(i,j)=\sum_{a=0}^{m-1}\sum_{b=0}^{n-1}I(i+a,j+a)K(a,b)
+    \end{equation*}
+    Correlation and Convolution operator will be same when $K$ is a symmetric matrix.
+    \item For practical implementations most libraries implement correlation operator rather than convolution.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/DL_convolution_example.png}
+        \caption{Convolution Example}
+    \end{figure}
+    \item When we convolve a filter with an image the resulting image is called a feature map.
+    \item If we use multiple such filters we will get multiple feature maps, and then we stack them, this number will in a way act as the number of color channels.
+    \item Let image be of size $W_1\times H_1\times D_1$, let the number of filters be $K$, let the output be of size $W_2\times H_2\times D_2$, and let stride be $S$ and spatial extent $F$. The filters are of size $F\times F\times D_1$.
+    \begin{equation*}
+        W_2=1+\frac{W_1-F}{S}\text{     }H_2=1+\frac{H_1-F}{S}\text{     }D_2=K
+    \end{equation*}
+    \item If we want the output to be of the same size as input, we add padding.
+    \begin{equation*}
+        W_2=1+\frac{W_1-F+2P}{S}\text{     }H_2=1+\frac{H_1-F+2P}{S}\text{     }D_2=K
+    \end{equation*}
+    \item One important characteristic of CNNs is \textbf{weight sharing}.
+    \item \textbf{Pooling}: Basically the same as a filter, except instead of multiplying with numbers, we take the max/min/average of the pixel intensities within the filter window.
+    \item Pooling essentially helps lower the size of the feature maps, and extract only essential or important features.
+    \item A simple CNN will have (Convolution$\to$Pooling)$\times 2$ layers, then a normal ANN.
+    \item Pooling layers will propagate gradient in backpropagation, as they do not have any weight attached to them.
+    \item For Max pooling, the gradient from the next layer is propagated only to the location of the maximum value in the pooling window.
+    \item For Average pooling, the gradient from the next layer is distributed equally to all elements in the pooling region because each element contributes equally to the average.
+    \item For convolution, the backpropagation update would be convolving the input($X$) to the convolution layer with the loss or gradient values given by the pooling layer.
+    \item And when we want to propagate the gradient we will convolve weights($W$) instead of $X$.
+\end{itemize}
+
+\subsection{Different Architectures}
+\begin{itemize}
+    \item \textbf{AlexNet}: Input size is of $227\times 227\times 3$, the architecture can be seen below. Approx $27M$ parameters.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{Degree//static/DL_AlexNet_Architecture.png}
+        \caption{AlexNet Architecture}
+    \end{figure}
+    \item \textbf{ZFNet}: Input size is the same, the architecture is basically the same as AlexNet except the three consecutive convolution layers have filters $512,1024$, $512$ respectively.
+    \item \textbf{VGGNet}: Input is again the same, the key idea in this is kernel size is always $3\times 3$.
+    \item \textbf{GoogleLeNet}: Key idea is to have multiple sized filters to capture features at varying range.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{Degree//static/DL_Inception_Model.png}
+        \caption{Inception Model}
+    \end{figure}
+    \item \textbf{ResNet}: Train a shallow network, then add layers and train deeper network. We can ensure this by adding a skip connection.
+\end{itemize}
+\pagebreak
+
+\section{Word Representations}
+\subsection{Direct Representations}
+\begin{itemize}
+    \item \textbf{Corpus}: Group of documents.
+    \item Consider the set $V$ of all uniques words across all input streams, $V$ is called the \textbf{vocabulary} of the corpus. We need a representation for every word in $V$.
+    \item We will be using the following corpus, to understand each representation
+    \begin{enumerate}
+        \item Human machine interface for computer applications
+        \item User opinion of computer system response time
+        \item User interface management system
+        \item System engineering for improved response time
+    \end{enumerate}
+    \item Vocabulary for this corpus is $V=[$human, machine, interface, for, computer, applications, user, opinion, of, system, response, time, interface, management, engineering, improved$]$
+    \item One very simple way of doing this is to use \textbf{one-hot vectors} of size $|V|$, essentially switch the bit on if the word is present else it is off.
+    \item \textbf{machine} would be represented as $\begin{bmatrix}
+        0&1&0&...&0&0
+    \end{bmatrix}$
+    \item $V$ tends to be very large, 50K for PTB, 13M for Google IT corpus.
+    \item These representations do not capture any notion of similarity.
+    \item With one hot representations, the Euclidean distance between any two words is $\sqrt{2}$ and the cosine similarity between any two words is $0$. 
+    \item We want representations of cat and dog to be closer to each other than the representations of cat and truck.
+    \item These are also called \textbf{sparse representations}.
+    \item A co-ocurrence matrix is a terms $\times$ terms matrix which captures the number of times a term appears in the context of another term
+    \item The context is defined as a window of $k$ words around the terms.
+    \item With $k=2$, the co-ocurrence matrix for the above corpus would be
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+            \hline
+             & human & machine & system & for & ... & user \\
+             \hline
+            human & 0 & 1 & 0 & 1 & ... & 0\\
+            \hline
+            machine & 1 & 0 & 0 & 1 & ... & 0\\
+            \hline
+            system & 0 & 0 & 0 & 1 & ... & 2\\
+            \hline
+            for & 1 & 1 & 1 & 0 & ... & 0\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            user & 0 & 0 & 2 & 0 & ... & 0\\
+            \hline
+        \end{tabular}
+        \caption{Co-Ocurrence Matrix}
+    \end{table}
+    \item Essentially for the word $w_1$, we check a window of $k$ words around it and count how many times other words appear.
+    \item This is also known as a word $\times$ context matrix.
+    \item We could choose the set of \textbf{words} and \textbf{contexts} to be same or different.
+    \item Each row (column) of the co-ocurrence matrix gives a representation of the corresponding word (context).
+    \item Stop words(a, the, for, etc.) are very frequent $\to$ these counts will be very high.
+    \item We can solve this by ignoring very frequent words or use a threshold $t$, and if a word, context pair goes above a threshold then we cap it.
+    \item Instead of count we can also use PMI
+    \begin{equation*}
+        PMI(w,c)=\log{\frac{p(c|w)}{p(c)}}=\log{\frac{count(w,c)\cdot N}{count(c)\cdot count(w)}}
+    \end{equation*}
+    Obviously, when $count(w,c)=0$ then PMI becomes $-\infty$, which is an issue.
+    \item We can solve this by taking PMI value as $0$ when $count(w,c)\leq 0$ and using the formula when $count(w,c)> 0$, this is called $PMI_0(w,c)$.
+    \item Another solution is instead of $count(w,c)>0$, we replace with $PMI(w,c)>0$. This is called Positive PMI or $PPMI$.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+            \hline
+             & human & machine & system & for & ... & user \\
+             \hline
+            human & 0 & 2.944 & 0 & 2.25 & ... & 0\\
+            \hline
+            machine & 2.944 & 0 & 0 & 2.25 & ... & 0\\
+            \hline
+            system & 0 & 0 & 0 & 1.15 & ... & 1.84\\
+            \hline
+            for & 2.25 & 2.25 & 1.15 & 0 & ... & 0\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            .&.&.&.&.&.&.\\
+            \hline
+            user & 0 & 0 & 1.84 & 0 & ... & 0\\
+            \hline
+        \end{tabular}
+        \caption{PMI Co-Ocurrence Matrix}
+    \end{table}
+    \item This is however still very large and very sparse, and it grows with vocabulary.
+    \item Consider $X=X_{PPMI_{m\times n}}$, we can use singular value decomposition to get a rank $k$ approximation.
+    \begin{equation*}
+        \hat{X}_{m\times n}=U_{m\times k}\Sigma_{k\times k} V_{k\times n}^T
+    \end{equation*}
+    \item SVD gives the best rank $k$ approximation of the original data, Discovers latent semantics in the corpus.
+    \item SVD will essentially extract the most important features from the matrix.
+    \item Conventionally, we take word representation as
+    \begin{equation*}
+        W_{word}=U\Sigma \in \mathbb{R}^{m\times k}
+    \end{equation*}
+    This is representation of the $m$ words in the vocabulary and $W_{context}=V$ is taken as the representation of the context words.
+    \item This idea comes from the fact that $\hat{X}\hat{X}^T$ and $W_{word}W_{word}^T$ are the same matrices, i.e., they roughly capture the same cosine similarity.
+    \item These methods are called count based models because they use the co-ocurrence counts of words. 
+\end{itemize}
+
+\subsection{Bag of Words Model}
+\begin{itemize}
+    \item \textbf{Task}: Predict the $n$th word given previous $n-1$ words.
+    \item \textbf{Training data}: All $n$ word windows in the corpus.
+    \item Consider doing this for $n=2$, predict the second word given the first.
+    \item We can model this problem using a feedforward neural network with one hidden layer. This network will take input a one-hot representation of the context word and output a probability vector of words.
+    \item Parameters are $W_{context}\in \mathbb{R}^{k\times |V|}$ and $W_{word}\in \mathbb{R}^{|V|\times k}$, and we use softmax to get probabilities.
+    \item The product $W_{context}x$ is simply the $i$th column of $W_{context}$, give $x$ is a one hot vector.
+    \item When the $i^{th}$ word is present the $i^{th}$ element in the one hot vector is ON and the $i^{th}$ column of $W_{context}$ gets selected.
+    \item There is a one to one correspondence between the words and columns of $W_{context}$.
+    \item We can treat the $i^{th}$ column of $W_{context}$ as the representation of the context $i$.
+    \item $P(word=i|v)$ depends on the $i^{th}$ column of $W_{word}$.
+    \item We thus treat the $i^{th}$ column of $W_{word}$ as the representation of the word $i$.
+    \item Consider the context word with index $c$ and the correct output with index $w$
+    \begin{equation*}
+        \begin{split}
+            L(\theta)=-\log \hat{y}_w=-\log P(w|c)\\
+            h=W_{context}x_c=u_c\\
+            \hat{y}_w=\frac{e^{u_cv_w}}{\sum_{w'\in V}e^{u_cv_{w'}}}
+        \end{split}
+    \end{equation*}
+    $u_c$ is the column of $W_{context}$ corresponding to context word $c$ and $v_w$ is the column of $W_{word}$ corresponding to the word $w$.
+    \item Give an context $u_c$ if we are predicting $v_w$ then the update rule for $v_w$ derived from backpropagation is
+    \begin{equation*}
+        v_w=v_w+\eta u_c(1-\hat{y}_w)
+    \end{equation*}
+    This increases the cosine similarity between $u_c$ and $v_w$.
+    \item The training objective ensures that the cosine similarity between word ($v_w$) and context word ($u_c$) is maximized
+    \item In practice, instead of window size of $1$ it is common to use a window size of $d$.
+    \item We can simply concatenate all the one-hot representations, and the first layer weights changes to\\
+    $[W_{context},W_{context},...d\text{ times}]$, this becomes very complex. Instead, we simply add the column where bit is on.
+    \begin{equation*}
+        h=\sum_{i=1}^{d-1}u_c,\text{ where }u_c\text{ is the column of }W_{context}\text{ where bit was on}
+    \end{equation*}
+    \item Computation of softmax is expensive as denominator requires sum of all words in vocabulary.
+\end{itemize}
+
+\subsection{Skip Gram Model}
+\begin{itemize}
+    \item Predicts context words given an input word.
+    \item the role of context and word has changed now.
+    \item It essentially becomes the same as bag of words, and we run into the same problems.
+    \item \textbf{Negative Sampling}
+    \item Let $D$ be the set of all correct $(w, c)$ pairs in the corpus
+    \item Let $D'$ be the set of all incorrect $(w, r)$ pairs in the corpus
+    \item $D'$ can be constructed by randomly sampling a context word $r$ which has never appeared with $w$ and creating a pair $(w, r)$
+    \item We are interested in maximizing
+    \begin{equation*}
+        \prod_{(w,c)\in D}P(z=1|w,c)\prod_{(w,r)\in D'}P(z=0|w,r)=\sum_{(w,c)\in D}\log \sigma(v_c^Tv_w)+\sum_{(w,r)\in D'}\log \sigma(-v_r^Tv_w)
+    \end{equation*}
+    \item The size of $D'$ is $k$ times the size of $D$.
+    \item \textbf{Contrast Estimation}: Consider instead of outputting probability we output a score.
+    \item Now, we want the score of correct word $s$ to be higher than wrong word $s_r$, so we try to maximize $s-s_r$.
+    \item But we would like the difference to be at least $m$, so we maximize $s-(s_r+m)$
+    \item If $s>s_r+m$ then we don't do anything.
+    \item \textbf{Hierarchical Softmax}: Construct a binary tree such that there are $|V|$ leaf nodes each corresponding to one word in the vocabulary.
+    \item There exists a unique path from the root node to a leaf node.
+    \item Let $l(w_1), l(w_2), ..., l(w_p)$ be the nodes on the path from root to $w$
+    \item Let $\pi(w)$ be a binary vector such that
+    \begin{equation*}
+        \pi(w)_k=\begin{cases}
+            1,\text{ path branches left at node }l(w_k)\\
+            0,\text{ otherwise}
+        \end{cases}
+    \end{equation*}
+    \item Finally each internal node is associated with a vector $u_i$
+    \item So the parameters of the module are $W_{context}$ and $u_1, u_2, . . . , u_v$ 
+    \item The probability of predicting a word is the same as predicting the correct unique path from the root node to that word.
+    \item We model
+    \begin{equation*}
+        P(\pi(on)_i=1)=\frac{1}{1+e^{-v_c^Tu_i}}\text{ and }P(\pi(on)_i=0)=1-P(\pi(on)_i=1)
+    \end{equation*}
+    \item Note that $p(w|v_c)$ can now be computed using $|\pi(w)|$ computations instead of $|V|$ required by softmax
+    \item Turns out that even a random arrangement of the words on leaf nodes does well in practice.
+\end{itemize}
+
+\subsection{GloVe Representations}
+\begin{itemize}
+    \item Count based methods (SVD) rely on global co-occurrence counts from the corpus for computing word representations
+    \item Predict based methods learn word representations using co-occurrence information
+    \item We will now combine the two.
+    \item Consider $X$ as the SVD decomposed matrix of the previous corpus.
+    \item $X_{ij}$ encodes important global information about the co-occurrence between $i$ and $j$.
+    \item Now we enforce
+    \begin{equation*}
+        \begin{split}
+            &v_i^Tv_j=\log P(j|i)=\log X_{ij}-\log X_i\\
+            &v_j^Tv_i=\log X_{ji}-\log X_j=\log X_{ij}-\log X_j(X_{ij}=X_{ji})
+        \end{split}
+    \end{equation*}
+    \item Adding the two equations we get
+    \begin{equation*}
+        \begin{split}
+            &2v_i^Tv_j=2\log X_{ij}-\log X_i-\log X_j\\
+            &v_i^Tv_j=\log X_{ij}-\frac{1}{2}\log X_i-\frac{1}{2}\log X_j=\log X_{ij}-b_i-b_j\\
+            &v_i^Tv_j+b_i+b_j=\log X_{ij}\\
+            &\min_{v_i,v_j,b_i,b_j}\sum_{i,j}(v_i^Tv_j+b_i+b_j-\log X_{ij})^2 
+        \end{split}
+    \end{equation*}
+    where $v_i^Tv_j+b_i+b_j$ is the predicted value using model parameters and $\log X_{ij}$ is the actual value calculated from the given corpus.
+    \item One drawback is that, this weighs all co-occurrences equally.
+    \item A simple fix is to multiply a weighing function $f(X_{ij})$
+    \begin{equation*}
+        f(x)=\begin{cases}
+            (\frac{x}{x_{max}})^\alpha,\text{ if }x<x_{max}\\
+            1,\text{ otherwise}
+        \end{cases}
+    \end{equation*}
+    where $\alpha$ can be tuned for a given dataset.
+\end{itemize}
+
+\subsection{Evaluating Word Representations}
+\begin{itemize}
+    \item \textbf{Semantic Relatedness}
+    \begin{enumerate}
+        \item Ask humans to judge the relatedness between a pair of words
+        \item Compute the cosine similarity between the corresponding word vectors learned by the model
+        \item Given many such word pairs, compute the correlation between $S_{model}$ \& $S_{human}$, and compare different models
+        \item Model 1 is better than Model 2 if $correlation(S_{model1}, S_{human}) > correlation(S_{model2}, S_{human})$
+    \end{enumerate}
+    \item \textbf{Synonym Detection}
+    \begin{enumerate}
+        \item Given: a term and four candidate synonyms
+        \item Pick the candidate which has the largest cosine similarity with the term
+        \item Compute the accuracy of different models and compare
+    \end{enumerate}
+\end{itemize}
+
+\section{Sequential Learning}
+\subsection{Introduction}
+\begin{itemize}
+    \item In many applications the input is not of a fixed size
+    \item Further successive inputs may not be independent of each other
+    \item We need to look at a sequence of (dependent) inputs and produce an output (or outputs)
+    \item Each input corresponds to one time step
+    \item Consider the task of predicting the part of speech tag (noun, adverb, adjective verb) of each word in a sentence
+    \item Once we see an adjective (social) we are almost sure that the next word should be a noun (man)
+    \item Thus the current output (noun) depends on the current input as well as the previous input
+    \item Further the size of the input is not fixed (sentences could have a arbitrary number of words)
+    \item Notice that here we are interested in producing an output at each time step
+    \item Each network is performing the same task (input : word, output : tag)
+    \item Sometimes we may not be interested in producing an output at every stage
+    \item Instead we would look at the full sequence and then produce an output
+    \item consider the task of predicting the polarity of a movie review
+    \item The prediction clearly does not depend only on the last word but also on some words which appear before
+    \item Here again we could think that the network is performing the same task at each step (input : word, output : $+/-$) but it’s just that we don’t care about intermediate outputs
+    \item Sequences could be composed of anything (not just words)
+\end{itemize}
+
+\subsection{Recurrent Neural Networks}
+\begin{itemize}
+    \item The function being executed at each time step is
+    \begin{equation*}
+        \begin{split}
+            &s_i=\sigma(Ux_i+b)\\
+            &y_i=O(Vs_i+c)
+        \end{split}
+    \end{equation*}
+    where $i$ is the timestep
+    \item Since we want the same function to be executed at each timestep we should share the same network
+    \item This parameter sharing also ensures that the network becomes agnostic to the size of the input
+    \item Since we are simply going to compute the same function at each timestep, the number of timesteps doesn’t matter
+    \item We just create multiple copies of the network and execute them at each timestep
+    \item Consider that we feed all previous inputs to the current network, this will be infeasible as now the network does not compute the same function at each time step and hence parameter sharing cannot take place.
+    \item The solution is to add a recurrent connection in the network
+    \begin{equation*}
+        \begin{split}
+            &s_i=\sigma(Ux_i+Ws_{i-1}+b)\\
+            &y_i=O(Vs_i+c)
+        \end{split}
+    \end{equation*}
+    \item This can be represented as follows
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Degree/static/DL_RNN.png}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.37\textwidth]{Degree/static/DL_compact_RNN.png}
+        \end{subfigure}
+        \caption{Recurrent Neural Network}
+    \end{figure}
+    \item Consider $x_i\in \mathbb{R}^n$, $s_i\in \mathbb{R}^d$ and $y_i\in \mathbb{R}^k$, then the dimensions of the parameters are
+    \begin{equation*}
+        U\in \mathbb{R}^{n\times d}\text{  }V\in \mathbb{R}^{d\times k}\text{ and }W\in \mathbb{R}^{d\times d}
+    \end{equation*}
+    \item The total loss is simply the sum of loss over all time steps.
+    \item The gradient of $V$ and $U$ is straightforward backpropagation.
+    \item However, gradient of $W$ will be a chain of gradients going through time, aka backpropagation through time.
+    \item For $W$ there is a high chance of vanishing/exploding gradients, as such we restrict backprop time steps to $\tau$.
+    \item The state ($s_i$) of an RNN records information from all previous time steps
+    \item At each new timestep the old information gets morphed by the current input
+    \item One could imagine that after $t$ steps the information stored at time step $t-k$ gets completely morphed so much that it would be impossible to extract the original information stored at time step $t - k$.
+    \item A similar problem occurs when the information flows backwards
+    \item It is very hard to assign the responsibility of the error caused at time step $t$ to the events that occurred at time step $t - k$
+\end{itemize}
+
+\subsection{Long Short Term Memory}
+\begin{itemize}
+    \item Consider the task of predicting the sentiment of a review
+    \item RNN reads the document from left to right and after every word updates the state
+    \item By the time we reach the end of the document the information obtained from the first few words is completely lost
+    \item Ideally we want to
+    \begin{enumerate}
+        \item forget the information added by stop words
+        \item selectively read the information added by
+        previous sentiment bearing words
+        \item selectively write new information from the current word to the state
+    \end{enumerate}
+    \item we have computed a state $s_{t-1}$ at timestep $t - 1$, and now we want to overload it with new information ($x_t$) and compute a new state ($s_t$).
+    \item We introduce a vector $o_{t-1}$ which decides what fraction of each element of $s_{t-1}$ should be passed to the next state
+    \item Each element of $o_{t-1}$ gets multiplied with the corresponding element of $s_{t-1}$
+    \item Each element of $o_{t-1}$ is restricted to be between $0$ and $1$
+    \begin{equation*}
+        \begin{split}
+            &o_{t-1}=\sigma(W_oh_{t-2}+U_ox_{t-1}+b_o)\\
+            &h_{t-1}=o_{t-1}\odot \sigma(s_{t-1})
+        \end{split}
+    \end{equation*}
+    $W_o,U_o,b_o$ need to be learned.
+    \item $o_t$ is called the output gate as it decides how much to pass (write) to the next time step
+    \item Now we calculate state information as
+    \begin{equation*}
+        \Tilde{s}_t=\sigma(Wh_{t-1}+Ux_t+b)
+    \end{equation*}
+    \item However, we may not want to use all this new information and only selectively read from it before constructing the new cell state $s_t$
+    \item To do this we introduce another gate called the input gate
+    \begin{equation*}
+        i_t=\sigma(W_ih_{t-1}+U_ix_t+b_i)
+    \end{equation*}
+    and then take dot product to get new temporary state $\Tilde{s}_t$
+    \item To selectively forget, we introduce another forget gate
+    \begin{equation*}
+        f_t=\sigma(W_fh_{t-1}+U_fx_t+b_f)
+    \end{equation*}
+    \item Now we have the full set of equations for LSTM, the gates are
+    \begin{equation*}
+        \begin{split}
+            &o_t=\sigma(W_oh_{t-1}+U_ox_t+b_o)\\
+            &i_t=\sigma(W_ih_{t-1}+U_ix_t+b_i)\\
+            &f_t=\sigma(W_fh_{t-1}+U_fx_t+b_f)
+        \end{split}
+    \end{equation*}
+    and the state equations are
+    \begin{equation*}
+        \begin{split}
+            &\Tilde{s}_t=\sigma(Wh_{t-1}+Ux_t+b)\\
+            &s_t=f_t\odot s_{t-1}+i_t\odot \Tilde{s}_t\\
+            &h_t=o_t\odot \sigma(s_t)\text{ and }rnn_{output}=h_t
+        \end{split}
+    \end{equation*}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_LSTM.png}
+        \caption{Long Short Term Memory}
+    \end{figure}
+    \item Another variant of LSTM is Gated Recurrent Unit, which has the following set of equations
+    \begin{equation*}
+        \begin{split}
+            &o_t=\sigma(W_os_{t-1}+U_ox_t+b_o)\\
+            &i_t=\sigma(W_is_{t-1}+U_ix_t+b_i)\\
+            &\Tilde{s}_t=\sigma(W(o_t\odot s_{t-1})+Ux_t+b)\\
+            &s_t=(1-i_t)\odot s_{t-1}+i_t\odot \Tilde{s}_t
+        \end{split}
+    \end{equation*}
+    \item No explicit forget gate, the forget gate and input gates are tied.
+    \item During forward propagation, the gates control the flow of information
+    \item They prevent any irrelevant information from being written to the state
+    \item Similarly, during backward propagation they control the flow of gradients
+    \item It is easy to see that during backward pass the gradients will get multiplied by the gate
+    \item If the state at time $t-1$ did not contribute much to the state at time $t$ then during backpropagation the gradients flowing into $s_{t-1}$ will vanish
+    \item But this kind of vanishing gradient is fine, since $s_{t-1}$ did not contribute to $s_t$ we don’t want to hold it responsible for the crimes of $s_t$
+\end{itemize}
+
+\section{Encoder-Decoder Models}
+\subsection{Introduction}
+\begin{itemize}
+    \item What if we want to generate a sentence given an image?
+    \item We are now interested in $P(y_t|y_{t-1},I)$ instead of $P(y_t|y_{t-1})$, where $I$ is an image.
+    \item We could now model $P(y_t = j|y_{t-1},I)$ as $P(y_t=j|s_t,f_{c_7}(I))$ where $f_{c_7}(I)$ is the representation obtained from the convolution layer of an image
+    \item There are many ways of making $P(y_t = j)$ conditional on $f_{c_7}(I)$
+    \item \textbf{Option 1}: Set $s_0 = f_{c_7}(I)$
+    \item Now $s_0$ and hence all subsequent $s_t$’s depend on $f_{c_7}(I)$
+    \item We can thus say that $P(y_t = j)$ depends on $f_{c_7}(I)$
+    \item \textbf{Option 2}: Another more explicit way of doing this is to compute
+    \begin{equation*}
+        s_t=RNN(s_{t-1},[x_t,f_{c_7}(I)])
+    \end{equation*}
+    \item We are explicitly using $f_{c_7}(I)$ to compute $s_t$ and hence $P(y_t = j)$
+    \item A CNN is first used to encode the image
+    \item A RNN is then used to decode (generate) a sentence from the encoding
+    \item This is a typical encoder decoder architecture
+    \item Both the encoder and decoder use a neural network
+    \item Alternatively, the encoder’s output can be fed to every step of the decoder
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Degree//static/DL_encoder_decoder.png}
+        \caption{Image Captioning}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Degree/static/DL_Encoder_decoder_1.png}
+        \caption{Textual Entailment}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{Degree/static/DL_Encoder_decoder_2.png}
+        \caption{Image Question Answering}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{Degree/static/DL_encoder_decoder_3.png}
+        \caption{Video Captioning}
+    \end{figure}
+\end{itemize}
+
+\subsection{Attention Mechanism}
+\begin{itemize}
+    \item Encoder decoder models can be made even more expressive by adding an “attention” mechanism
+    \item At each time-step we should feed only this relevant information (i.e. encodings of relevant words) to the decoder
+    \item We could just take a weighted average of the corresponding word representations and feed it to the decoder.
+    \item The machine will have to learn this from the data
+    \item To enable this, we define a function $e_{jt} = f_{ATT}(s_{t-1}, h_j)$
+    \item This quantity captures the importance of the $j^{th}$ input word for decoding the $t^{th}$ output word.
+    \item We can normalize these weights by using the softmax function
+    \begin{equation*}
+        \alpha_{jt}=\frac{\exp{e^{jt}}}{\sum_{j=1}^M\exp{e^{jt}}}
+    \end{equation*}
+    \item $\alpha_{jt}$ denotes the probability of focusing on the $j^{th}$ word to produce the $t^{th}$ output word.
+    \item One possible choice for $f_{ATT}$ is
+    \begin{equation*}
+        e_{jt}=V_{att}^T\tanh{U_{att}s_{t-1}+W_{att}h_j}
+    \end{equation*}
+    \item We are essentially asking the model to approach the problem in a better, more natural way
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_machine_translation_attention.png}
+        \caption{Architecture with Attention}
+    \end{figure}
+    \item We can check whether the attention model learns something meaningful by plotting the attention weights as a heatmap.
+    \item In the case of text, we have a representation for every location of the input sequence.
+    \item But for images, we typically use representation from one of the fully connected layers. This representation does not contain any location information.
+    \item Instead of the $f_{c_7}$ representation, we use the output of one of the convolution layers, which has spatial information.
+    \item For example, the output of the $5^{th}$ convolutional layer of VGGNet is a $14 \times 14 \times 512$ size feature map. We could think of this as $196$ locations, each having a $512$ dimensional representation. The model will then learn an attention over these locations.
+\end{itemize}
+
+\subsection{Hierarchical Attention}
+\begin{itemize}
+    \item Consider a dialog between a user (u) and a bot (B)
+    \item The dialog contains a sequence of utterances between the user and the bot
+    \item Each utterance in turn is a sequence of words
+    \item Thus what we have here is a “sequence of sequences” as input.
+    \item We could think of a two level hierarchical RNN encoder
+    \item The first level RNN operates on the sequence of words in each utterance and gives us a representation
+    \item We now have a sequence of utterance representations (red vectors in the image)
+    \item We can now have another RNN which encodes this sequence and gives a single representations for the sequences of utterances
+    \item The decoder can then produce an output sequence conditioned on this utterance
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/DL_2_layer_RNN.png}
+        \caption{Two layer RNN}
+    \end{figure}
+    \item Consider another example of classification of documents, each document is a sequence of sentences and each sentence is in turn a sequence of words.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_document_classification.png}
+        \caption{Document Classification}
+    \end{figure}
+    \item We need attention at two levels\\
+    First, we need to attend to important (most informative) words in a sentence.\\
+    Then we need to attend to important (most informative) sentences in a document.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{Degree//static/DL_transformer_encoder.png}
+        \caption{Encoder Architecture}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{Degree//static/DL_transformer_decoder.png}
+        \caption{Decoder Architecture}
+    \end{figure}
+\end{itemize}
+\pagebreak
+
+\section{Transformer Models}
+\begin{itemize}
+    \item In encoder-decoder architecture, we have to wait for until $s_{t-1}$ is calculated to calculate $s_t$.
+    \item The idea is to calculate all these in parallel, instead of waiting.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_transformer_architecture.png}
+        \caption{Transformer Architecture}
+    \end{figure}
+\end{itemize}
+\subsection{Self-Attention}
+\begin{itemize}
+    \item Inputs are vectors, word embeddings, and the outputs are also vectors.
+    \item Given a word in a sentence, we want to compute the relational score between the word and the rest of the words in the sentence, such that the score is higher if they are related contextually.
+    \item now both the vectors $s_i$ and $h_j$, for all $i,j$ are available for all the time.
+    \item The score function we used was
+    \begin{equation*}
+        score(s_{t-1},h_j)=V_{att}^T\tanh{U_{att}s_{t-1}W_{att}h_j}
+    \end{equation*}
+    \item There are three vectors involved in computing the score at each time step.
+    \item We get them by transforming $h_j$
+    \item $q_j=W_Qh_j$, called the query vector
+    \item $k_j=W_Kh_j$ called the key vector
+    \item $v_j=W_Vh_j$ called the value vector
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_self_attention.png}
+        \caption{Self Attention}
+    \end{figure}
+    \item We will first calculate $score(q_1,k_j)$, $e_{1j}=[q_1\cdot k_1,q_1\cdot k_2,...,q_1\cdot k_5]$
+    \item Then we get $\alpha_{1j}=softmax(e_{1j})$, finally we get $z_1=\sum_{j=1}^5\alpha_{1j}v_j$
+    \item Query and key vector participate in calculating $\alpha$, and value vector will participate in getting final output.
+    \item All query, key and value vectors can be computed in one go, as follows
+    \begin{equation*}
+        Q=[q_1,q_2,...,q_T]=W_Q[h_1,h_2,...,h_T]
+    \end{equation*}
+    \item The entire output can also be computed in parallel as follows
+    \begin{equation*}
+        Z=[z_1,z_2,...,z_T]=softmax(\frac{Q^TK}{\sqrt{d_k}})V^T
+    \end{equation*}
+    where $d_k$ is the dimension of key vector.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.3\linewidth]{Degree//static/DL_self_attention_block.png}
+        \caption{Self Attention Block}
+    \end{figure}
+\end{itemize}
+
+\subsection{Multi-Headed Attention}
+\begin{itemize}
+    \item The idea of having multi-headed attention is pretty much the same idea for having multiple filters in CNN.
+    \item \textbf{Two-headed attention}: Have two self attention block side-by-side.
+    \item We simply concatenate the output from each block.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_multi_head_attention.png}
+        \caption{Multi-Headed Attention Block}
+    \end{figure}
+    \item The outputs are then passed to a feed forward network, this is our usual ANN.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{Degree//static/DL_feed_forward_network.png}
+        \caption{Feed Forward Network}
+    \end{figure}
+    \item Identical network for each position, $FFN(z) = \max(0, W_1z + b_1)W_2 + b_2$
+    \item The encoder is composed of identical layers, and each layer is composed of 2 sub-layers.
+    \item The computation is parallelized in the horizontal direction, i.e. within a training sample, of the encoder stack, not along the vertical direction.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/DL_encoder_stack.png}
+        \caption{Encoder Stack}
+    \end{figure}
+\end{itemize}
+
+\subsection{Decoder Architecture}
+\begin{itemize}
+    \item Takes input from the encoder, and also has self-inputs, they are the words that we have predicted/decoded so far.
+    \item Each layer is composed of three sub-layers.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{Degree//static/DL_decoder_block.png}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{Degree//static/DL_decoder_block_detail.png}
+        \end{subfigure}
+        \caption{Decoder Block}
+    \end{figure}
+    \item We don't know how long is the output going to be, hence we will consider a max length $T_1$.
+    \item At the beginning only $<GO>$ makes sense, all other inputs will be junk, hence we have "masked" self attention. Essentially, we make all $\alpha$ greater than current decoded word $0$.
+    \item Masking is done by inserting negative infinite at the respective positions. This works because we take $\max$ of values(ReLU) in the feedforward network.
+    \item We will also use masking in cross attention.
+    \item We will take the values coming from encoder, and get $K$ and $V$. We will use output from self-attention as $Q$, then cross attention becomes the same as self-attention.
 \end{itemize}
 
 \end{document}

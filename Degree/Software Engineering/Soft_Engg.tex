@@ -473,8 +473,395 @@ Software Engineering
         \item Guide Development of software
         \item Close correspondence with the implementation. Generate code from models.
     \end{enumerate}
-    \item \textbf{VeriSIM}: \textbf{Veri}fying designs by \textbf{Sim}ulating Scenarios. Develop an integrated understanding of class and sequence diagrams.
+    \item \textbf{VeriSIM}: \textbf{Veri}fying designs by \textbf{Sim}ulating Scenarios. Develop an integrated understanding of class and sequence diagrams. A VeriSIM learning platform can be found \href{https://verisim.tech/}{here}.
     \item \textbf{Design Tracing Strategy}: Construct a state diagram which models the scenario.
+    \item Check chapter 3 of the reference manual for an overview, it can be found \href{https://drive.google.com/file/d/1Jd-X3rmu4JLpsZgn1dPV7AFo-NGsFi3H/view}{here}.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.55\linewidth]{Degree//static/SE_class_diagram.png}
+        \caption{UML Class Diagram}
+    \end{figure}
 \end{itemize}
 
+\section{Software Development}
+\subsection{Rest APIs}
+\begin{itemize}
+    \item Use $editor.swagger.io$, can be found \href{https://editor.swagger.io/}{here}.
+    \item Use Insomnia software for testing downloaded YAML file and code. Download link can be found \href{https://insomnia.rest/download}{here}.
+\end{itemize}
+
+\subsection{Version Control System}
+\begin{itemize}
+    \item Several developers are working on a project. One developer changed some code that caused a failure and now the system cannot start. Either\\
+    Identify and fix the issue. Could take a long time to debug as you don't know the change history, till then no other team member can test their new code changes as the bug will not let the system start.\\
+    Or just roll back to the previous version of code that was running stable.
+    \item Consider a company with hundreds of clients of a software system. Every client specific feature needs a new version to be released and maintained.\\
+    Huge code vase, code duplicated.\\
+    Several versions result in multiple copies of code. Difficult to maintain and administer these copies manually.
+    \item \textbf{VCS}: A system that helps in tracking and managing changes to the \textbf{source code} or other documents, and maintaining versions of the code.
+    \item Increases productivity, Better communication and collaboration, Saving space on multiple revisions through diffs/snapshots, Better efficiency even as teams scale.
+    \item \textbf{Centralized VCS}: maintained on the server, that everybody shares. Entirely based on client server model. Checkout whole or part of the repository, make changes and push back the changes to the server. Highly dependent on the server.\\
+    Anything goes wrong, the development halts till the server is up again.\\
+    May even lose entire history or repository if no backups configure.
+    \item \textbf{Distributed VCS}: Entire repository is mirrored locally that includes the full change history. Centralized repository hosting possible but complete dependency is not on it. Basically everyone owns their own local copies of the repository.
+    \item \textbf{Git}: Free and open source VCS. Focus is on speed, data integrity and working on multiple tasks.
+    \item \textbf{Modified}: After you change the file in your working directory.
+    \item \textbf{Staged}: You marked the file to be committed.
+    \item \textbf{Committed}: Changed stored in the local database. But only the staged files will be committed.
+    \item \textbf{Create a new repository}: \textit{git init} initializes a new git repository in your current working directory. \textit{git add filename} stage the modified files. \textit{git commit -m "change description"} commit the staged files to DB.
+    \item \textbf{Clone a repository}: \textit{git clone url local directory} mirror repo located at "url" to "local directory".
+    \item \textit{git push} to push changes to the remote repo.
+    \item \textit{git pull} fetch and download changes from remote rep and update local repo.
+    \item \textit{git status} view the status of your local files in the working directory and staging area.
+    \item \textit{git diff} show changes between commits, commit and working tree
+    \item \textit{git reset HEAD filename} unstage the file
+    \item \textit{git checkout filename} undo the changes that are committed but not yet pushed to remote.
+    \item \textit{git log} check commit logs/history.
+    \item \textbf{Branching}: Branches are independent versions of repository. Mechanism to diverge work from the main project line.\\
+    \textit{git branch feature1} create a new branch named feature1 from the base branch you are working on.\\
+    \textit{git branch} list all local branches\\
+    \textit{git checkout} command to switch branch, \textit{git checkout feature1}
+    \item \textbf{Merging}: A way to combine changes made through one or more branches to a single branch.\\
+    \textit{git merge feature1} merge the branch "feature1" to the current working branch.
+    \item \textbf{Rebase}: Incorporate changes from one branch to another. Incorporate latest changes from master branch to feature1 branch. \textit{git rebase}.
+    \item For more details refer git-scm book, can be found \href{https://git-scm.com/book/en/v2}{here}.
+    \item An issue is reported by developer or tester or user when encountered, this needs to be saved and tracked till it is fixed. We need a system to do this.
+    \item Can create a branch or pull request to map to an issue. Can map more than one issues to a branch.
+    \item \textbf{Code Reviewing}: Quality assurance in which multiple people examine the changes done by a developer.
+    \item Improves code Quality, Focus not just on correctness but also on aspects like efficiency, complexity and security.
+    \item Minimize Technical debt, Well documented code with consistent design and implementation reduces maintenance costs and efforts.
+    \item Risk reduction, Testing cannot guarantee software to be completely bug free.
+    \item Supports Knowledge transfer, Learn from others expertise.
+    \item Make QA testing easier, Many risks can be identified at earlier stage itself.
+    \item \textbf{Pair programming}: An agile software development technique in which two programmers work together at one workstation. One writes code while the other reviews the code. The two programmers switch roles frequently. Getting popular slowly.
+\end{itemize}
+
+\subsection{Debugging}
+\begin{itemize}
+    \item \textbf{Error}: discrepancy between actual behaviour and intended behaviour
+    \item \textbf{Failure}: Observable error, Incorrect output value, exception etc.
+    \item \textbf{Fault}: Where the failure has occurred (lines in code)
+    \item \textbf{Debugging}: determining the cause of failure
+    \item Reproduce the problem $\to$ Find cause of defect $\to$ Investigate fix $\to$ Implement fix $\to$ Test fix
+    \item \textbf{Logging}: insert print statements
+    \item \textbf{Dump \& diff}: use diff tool to compare logging data between executions
+    \item \textbf{Stepping in debugger}
+    \item \textbf{Profiling tool}: how often, how long various parts of program are executed.
+    \item \textbf{Input manipulation}: Edit inputs, observe differences in output
+    \item \textbf{Backwards}: Find statement that generated incorrect output, follow data and control dependencies backwards to find incorrect line of code
+    \item \textbf{Forwards}: Find event that triggered incorrect behavior, follow control flow forward until incorrect state reached
+    \item \textbf{Black box debugging}: Find documentation, code examples to understand correct use of API
+    \item Pdb: Python Debugger
+\end{itemize}
+
+\subsection{Software Metrics}
+\begin{itemize}
+    \item Quantitative way to measure the quality of your code
+    \item \textbf{Cyclomatic Complexity}: Number of decisions a block of code contains $+ 1$, use \textit{Radon}(python package).
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\linewidth]{Degree//static/SE_Cyclomatic_complexity.png}
+        \caption{Cyclomatic Complexity effects}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=0.7\textwidth]{Degree//static/SE_Halstead_metrics.png}
+            \caption{Halstead's Metrics}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.45\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{Degree/static/SE_CC_score.png}
+            \caption{CC Score}
+        \end{subfigure}
+    \end{figure}
+    \item \textbf{LOC}: The total number of lines of code.
+    \item \textbf{LLOC}: The number of logical lines of code. Every logical line of code contains exactly one statement
+    \item \textbf{SLOC}: The number of source lines of code
+    \item \textbf{Comments}: The number of comment lines
+    \item \textbf{Code Smells}: Certain problematic characteristics in a code
+    \item Redundant comments, Commented out code
+    \item Functions doing more than one thing, Functions that are too long, Functions having too many arguments, Functions having flag arguments, Dead functions
+    \item \textbf{Don’t repeat yourself (DRY)}: Clumps of identical code throughout the program, Put this code in simple methods, Incorrect behaviour at the boundaries, Use explanatory variables
+    \item \textbf{Refactoring}: Changing the code by improving its structure, without changing its behaviour.
+\end{itemize}
+
+\section{Software Architecture}
+\subsection{Introduction}
+\begin{itemize}
+    \item Way of organizing your code
+    \item Define software elements/modules, relations among them, and properties of both elements and relations.
+    \item \textbf{Client-server systems}: data is transacted in response to requests
+    \item \textbf{Pipe and filter}: data is passed from component to component, and transformed and filtered along the way
+    \item \textbf{Model-view-controller}: Architectural style where views of the data are separated from the manipulations of data
+    \begin{enumerate}
+        \item \textbf{Model}: the component which models the data required for the service
+        \item \textbf{View}: the GUI objects, presentation layer, visual representation of the Model
+        \item \textbf{Controller}: coordinates multiple Views on the screen, and helps users manipulate the model
+    \end{enumerate}
+    \item \textbf{Peer to Peer Architecture}: Distributed application - different systems form nodes, and share resources with each other. 
+    \item No centralized system which monitors all transactions of the system
+    \item Nodes in the network make processing power, disk storage etc. directly available to other nodes in the network
+    \item \textbf{Component}: A well-defined functionality or behavior separate from other functionality and behavior
+    \item \textbf{Connectors}: Code that transmit information between components. Responsible for regulating interactions between components
+    \item \textbf{Protocols}: Set of pre-defined rules which describe how components should interact with each other
+    \item \textbf{Design Patterns}: Descriptions of communicating objects and classes that are customized to solve a general design problem in a particular context
+    \item \textbf{Design Smells}: warning signs that your code may be heading towards an antipattern
+    \item \textbf{SOLID Guidelines}: Avoid design smells
+    \item \textbf{Refactoring}: moving code between classes, creating new classes or modules, removing classes that aren’t required
+\end{itemize}
+
+\subsection{SOLID Principles}
+\begin{itemize}
+    \item Object-oriented principles for software design, Makes code easy to understand, modular
+    \begin{enumerate}
+        \item \textbf{S}: Single Responsibility Principle, Every class has a single responsibility/purpose
+        \item \textbf{O}: Open-Closed Principle, Software entities should be open for extension, but closed for modification
+        \item \textbf{L}: Liskov Substitution Principle, Derived classes should be substitutable by their base class
+        \item \textbf{I}: Interface Segregation Principle, Specify what the interface should do, not how.\\
+        "do not force any client to implement an interface which is irrelevant to them"
+        \item \textbf{D}: Dependency Inversion Principle, Prefer abstraction/interfaces over implementations
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Design Patterns}
+\begin{itemize}
+    \item Design patterns are descriptions of communicating objects and classes that are customized to solve a general design problem in a particular context. 
+    \item \textbf{Problem}: When to apply the design patterns, in what context
+    \item \textbf{Solution}: Describe the elements that make up the design, their relationships, responsibilities and collaborations. Essentially make a template that can be applied in many different situations.
+    \item \textbf{Creational}: Used during the process of object creation
+    \begin{enumerate}
+        \item \textbf{Factory Design Pattern}: Replace object construction calls with calls to a special factory method.\\
+        \textbf{Pros}: Single Responsibility Principle, Open-Closed Principle\\
+        \textbf{Cons}: Code may become more complicated, a lot of new subclasses needed to implement the pattern
+        \item \textbf{Builder Design Pattern}: Optional parameters necessitates use of multiple constructors, this is known as telescoping constructors.\\
+        \textbf{Solution}: move object construction code it to separate objects called builders\\
+        \textbf{Pros}: Construct objects step by step, Single Responsibility Principle\\
+        \textbf{Cons}: Code may become more complicated, new classes, methods need to be created
+    \end{enumerate}
+    \pagebreak
+    \item \textbf{Structural}: Composition of classes or objects
+    \begin{enumerate}
+        \item \textbf{Facade Design Pattern}: Reusing code, will have to know details about different objects, functions\\
+        \textbf{Solutions}: Provides a simple interface to a library, or a complex set of classes\\
+        \textbf{Pros}: Isolate code from other libraries/classes’ complexity\\
+        \textbf{Cons}: Tightly coupled to other objects, maintenance becomes more difficult
+        \item \textbf{Adapter Design Pattern}: Some products have cost in dollars/euros. Conversion to rupees is needed\\
+        \textbf{Pros}: separate data conversion code from primary business logic, New types of adapters\\
+        \textbf{Cons}: Overall code complexity increases
+    \end{enumerate}
+    \item \textbf{Behavioral}: Characterize the ways in which classes or objects interact and distribute responsibility
+    \begin{enumerate}
+        \item \textbf{Iterator Design Pattern}: Different types of collections, How to access and iterate through elements?\\
+        \textbf{Solution}: Separate the behaviour of how elements are accessed into a separate object called an iterator\\
+        \textbf{Pros}: Separate access of elements from other functionalities, new types of iterators, collections\\
+        \textbf{Cons}: Can be an overkill for simple collections
+        \item \textbf{Observer Design Pattern}: Notify a particular set of buyers when a new product is launched\\
+        \textbf{Solution}: Subject object maintains a list of observers, Notifies them of automatically of any changes
+        \item \textbf{Strategy Design Pattern}: Process orders based on different strategies\\
+        \textbf{Solution}: Extract different strategies (algorithms) into separate classes, Original class (context) delegates the work to strategy object\\
+        \textbf{Pros}: Isolate implementation details of algorithm, new strategies without changing existing classes\\
+        \textbf{Cons}: Not required if there are only a few algorithms which will be used
+    \end{enumerate}
+
+\end{itemize}
+
+\section{Testing}
+\subsection{Motivation}
+\begin{itemize}
+    \item Errors in software programs, even simple errors can cause entire systems to crash.
+    \item \textbf{Test case}: triplet $[I,S,R]$\\
+    I: data input to the programming\\
+    S: State of the program at which the data is to be input\\
+    R: result expected to be produced by the program
+    \item \textbf{Test suite}: Set of all test cases which have been designed to test a given program.
+    \item Testing for a large collection of randomly selected test cases do not guarantee that all errors will be uncovered.
+    \item Domain of all input values in a software system is sufficiently large.
+    \item Necessary to design a minimal test suite where each test case helps detect different types of errors.
+    \item \textbf{Unit testing}: Individual functions/units of a program are tested.
+    \item \textbf{Integration testing}: Units are incrementally integrated and tested after each step of integration.
+    \item \textbf{System testing}: the fully integrated system is tested
+    \item \textbf{Alpha testing}: test team within the organization
+    \item \textbf{Beta testing}: select group of customers
+    \item \textbf{Acceptance testing}: customer to determine whether to accept the delivery of the software.
+\end{itemize}
+
+\subsection{Unit Testing}
+\begin{itemize}
+    \item While testing a module, other modules with which this module needs to interface may not be ready.
+    \item Makes debugging easier.
+    \item When: During the coding of the module. Not in the testing phase
+    \item Who: Person writing the code for the module.
+    \item Python unit testing: \textit{unittest} and \textit{pytest}
+\end{itemize}
+
+\subsection{Black box and White box testing}
+\begin{itemize}
+    \item \textbf{Black box testing}: Examining input/output values only, No knowledge of design or code required
+    \item \textbf{Equivalence Class Partitioning}: Domain of input values partitioned into a set of equivalence classes. Program behaves similarly for every input data in a particular equivalence class.
+    \item \textbf{Boundary Value Analysis}: Examine the values at boundaries of the equivalence classes.
+    \item \textbf{White box testing}: Analyze the structure of the program using some heuristics
+    \item \textbf{Branch coverage}: Every branch in the program needs to be taken at least once
+    \item \textbf{Multiple branch coverage}: Each component condition takes true and false values
+    \item \textbf{Path coverage}: access all linearly independent path at least once.
+\end{itemize}
+
+\subsection{Integration and System testing}
+\begin{itemize}
+    \item When at least a few or all modules have undergone unit testing
+    \item \textbf{Integration testing}: detect errors at the module interfaces
+    \item \textbf{Big Bang Approach}: All modules integrated in a single step
+    \item \textbf{Bottom up Approach}: Modules of each sub system are integrated, Not necessary to create stubs, Drivers are required.
+    \item \textbf{Top-down Approach}: Starts with the root module + 1-2sub-ordinate modules of the root module, Stubs are required.
+    \item \textbf{Mixed Approach}: Use both top-down and bottom-up testing
+    \item \textbf{Smoke testing}: Carried out before initial system testing, Checking whether basic functionalities are working, Few basic test cases designed
+    \item \textbf{Performance testing}: Check whether the system meets non-functional requirements
+\end{itemize}
+
+\subsection{Test Driven Development}
+\begin{itemize}
+    \item Used especially in Agile Processes
+    \item Write tests first for the functionality that we want to implement
+    \item Drive design and development of that functionality from tests
+    \item Express the functionality/feature/requirement in the form of a test
+    \item Create a test Run the test - See it FAIL
+    \item Create the Minimum code to meet the needs of the test
+    \item Run it and See it PASS
+    \item REFACTOR code - quality, make it modular, more elegant
+\end{itemize}
+
+\section{Software Deployment}
+\subsection{Development Environment and Strategies}
+\begin{itemize}
+    \item \textbf{Development Environment}: Local environment of a software developer, Contains IDE and other tools
+    \item After Development or during we have a testing environment.
+    \item \textbf{Staging Environment}: Exactly resembles the production environment, Run on a remote machine
+    \item Deploying a software system involves a lot of activities, configurations etc.
+    \item Staging helps Preview new features, Performance testing
+    \item After staging, we push it to production environment.
+    \item \textbf{Blue/Green Deployment}: Staged Deployment, Create a new separate production environment for the new version, without affecting the current one, Regular cycling between real and previous versions\\
+    \textbf{Advantage}: rollback is easy
+    \item \textbf{Canary Deployment}: Phased Rollout/Incremental Rollout, Slowly roll out the change to a small subset of users\\
+    \textbf{Drawback}: manage multiple instances at once
+    \item \textbf{Versioned Deployment}: Allow users to choose version, Keep all versions alive, If user updates, route them to the new version\\
+    \textbf{Drawback}: have to maintain multiple versions
+\end{itemize}
+
+\subsection{Deployment Hosting}
+\begin{itemize}
+    \item Infrastructure required to host applications, Usually hosted on server systems
+    \item no unplanned downtime
+    \item \textbf{Bare Metal Servers}: Purchase actual server hardware, Server - CPU, motherboard, RAM, disk\\
+    \textbf{Advantage}: highest performance\\
+    \textbf{Disadvantage}: Most expensive upfront, Time, effort in setting up, maintenance
+    \item \textbf{Infrastructure-as-a-service(IaaS)}: IaaS provider provides a part of the infrastructure\\
+    \textbf{IaaS examples}: Digital Ocean, AWS, Linode\\
+    \textbf{Advantages}: Cheaper, No maintenance overhead\\
+    \textbf{Disadvantages}: Each IaaS has its own set of configurations, Shared by others so performance may suffer
+    \item \textbf{Platform-as-a-Service(PaaS)}: Provides a software layer as well on which a web app can be deployed\\
+    \textbf{Examples}: Heroku, Google App Engine\\
+    \textbf{Advantage}: very easy to deploy \\
+    \textbf{Disadvantage}: lack of control
+\end{itemize}
+
+\subsection{Continuous Integration}
+\begin{itemize}
+    \item Automating the integration and deployment of software
+    \begin{enumerate}
+        \item Developer commits code to version control system
+        \item Continuous Integration Server pulls the new code
+        \item CIS build and tests the new code
+        \item Once code passes all tests, CIS signals Staging/Deployment server
+        \item Staging server pulls the code from version control system
+        \item Then it builds, tests, and deploys the new code.
+        \item Once deployed Staging server signals back to CIS, and the process starts again.
+    \end{enumerate}
+    \item Maintain a single source repository
+    \item Automate the Build, Build Tools: Ant, Gradle, Builder
+    \item Make the Build Self-Testing, Create automated tests, When a test fails send notification to the developer
+    \item Commit to the main branch everyday
+    \item Infrequent commits can have increased chances of more conflict errors
+    \item Frequent commits encourage developers to break down their works into very small chunks
+    \item Every commit should build the main branch on an integration server
+    \item \textbf{Continuous Integration Servers}: Jenkins, Cruise Control
+    \item Fix broken builds immediately, take the system back to the last-known good build
+    \item Write Scripts to automate deployment
+    \item Benefits of Continuous Integration
+    \begin{enumerate}
+        \item Reduces deployment time, Avoids last-minute confusion and rush at release dates
+        \item Beneficial to users, Can see an initial prototype
+        \item Beneficial for developers, pushes developers to create modular code
+    \end{enumerate}
+    \item However, Initial effort required to setup processes
+\end{itemize}
+
+\subsection{Performance and Monitoring}
+\begin{itemize}
+    \item \textbf{Caching}: Store results of common operations in memory, Fetch from memory instead from database, examples include Memcached, Redis
+    \item Different levels of caching are Web browser, Web server(page cache), Database query cache, results of recent queries which haven’t changed
+    \item \textbf{Asynchronous work queue}: executed outside the HTTP request-response cycle
+    \item Consists of Queue of jobs to be performed, parameters and Pool of workers take multiple jobs from queue
+    \item Quick loading of pages is important, minifying code helps, and compressing static pages.
+    \item Issues can still arise in the live environment
+    \item \textbf{Generate reports}: Analyze page resources, find optimization suggestions, check SEO and accessibility metrics and calculate your performance score. One example of this is Lighthouse.
+    \item \textbf{Clickstreams}: which sequences of pages do your users visit the most
+    \item \textbf{Think time/dwell time}: how long does a typical user stay on a given page
+    \item \textbf{Abandoment}: Check various flows in your application
+    \item Embed a small piece of JS in every page on your site
+    \item In canary deployment, check which version is better.
+\end{itemize}
+
+\section{Other Aspects}
+\subsection{Software Organizations}
+\begin{itemize}
+    \item \textbf{Marketing Team}: Look for opportunities in the market, to provide value, Conduct market research, identify audiences
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/SE_PM_stuff.png}
+        \caption{Product Manager}
+    \end{figure}
+    \item \textbf{Business}: Works closely with marketing teams and sales, Understand business goals, how the product will maximize return on investment
+    \item \textbf{Tech}: Should know the technology stack, Understand the level of effort involved, Take important technical decisions.
+    \item \textbf{UX}: Passionate about the user, What does the user want
+    \item A good product manager must be experienced in at least one, passionate about all three, and conversant with practitioners in all.
+    \item \textbf{Designers}: User Experience (UX) roles, Transform requirements to solutions, Talk to users, create prototypes
+    \item \textbf{Software Engineers}: Write code with others in the team to implement requirements, Software engineers don’t get to decide what product is made, or what problems the product solves
+    \item \textbf{Engineering Managers}: In large organizations, transmitting information between higher and lower parts, Also known as project manager.
+    \item PMs are responsible for Organizing and prioritizing work, Coordinating between different teams, Resolving interpersonal conflict between engineers
+    \item \textbf{Sales Team}: Sell the product it to users that marketing team has identified. Provide feedback to marketing, product, and design teams regarding the product, which engineers then address.
+    \item \textbf{Support Team}: Resolve problems that clients have, Provide feedback to product, design, and engineering about the product and it’s defects/shortcomings
+    \item \textbf{Data Scientists}: Analyze data generated from different teams, users, Help organization make better decisions
+    \item \textbf{Ethics and Policy Specialists}: People with background in law, social science, policy, Shape the terms of service of the software product, software licenses, privacy policy etc. Important for any company that works with data
+\end{itemize}
+
+\subsection{Communication, Collaboration and Productivity}
+\begin{itemize}
+    \item \textbf{Conceptual Integration}: Everyone on a team has the same understanding of what is being built and why, Effective communication ensures conceptual integrity
+    \item \textbf{Knowledge Sharing Tools}: used for sharing documents and archiving decisions
+    \item \textbf{Issue Tracker}: JIRA, Pivotal Tracker, Track different issues, History of who all worked on these issues
+    \item \textbf{GitHub Pages}: Many libraries, frameworks are hosted on GitHub
+    \item \textbf{Stack Overflow}: Helps to resolve issues that you are facing, Provides links to additional learning resources
+    \item Knowledge of one project might be needed in another project. Useful if it is documented and archived properly
+    \item When people leave the organization, specialized knowledge goes along with them
+    \item Mitigation: “cross-training”, rotating developers between projects
+    \item \textbf{Productivity}: Traditionally work done per unit time, this is difficult to define in software engineering, Not necessarily no of lines of code
+    \item \textbf{Project Management Tools}: Enables all members of the team to get a big picture as well as detailed view of progress
+    \item \textbf{Development Tools}: IDEs, features in IDEs help developers become more productive
+\end{itemize}
+
+\subsection{What Makes a Great Software Engineer?}
+\begin{itemize}
+    \item \textbf{Macro Designs}: design and architecture level, e.g. which libraries, frameworks to use
+    \item \textbf{Micro Designs}: Algorithms, data structures for a particular module
+    \item Rational Decision-Making Process
+    \begin{enumerate}
+        \item Identify the decision to be made
+        \item Systematically identify alternatives
+        \item Think through potential outcomes
+        \item Evaluate which of the outcome is best for the given context
+        \item Make a decision
+    \end{enumerate}
+\end{itemize}
 \end{document}
