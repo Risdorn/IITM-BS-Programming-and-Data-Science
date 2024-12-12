@@ -63,14 +63,19 @@ class networkPerceptron():
         self.inputs = inputs
         self.generatePermutations(inputs)
         self.makeInputLayer(inputs)
-        self.outputPerceptron = perceptron(weights=weights, bias=bias)
+        if weights == []: weights = np.random.rand(2**inputs)
+        if bias == 0: bias = np.random.rand()
+        self.outputPerceptron = perceptron(weights=weights, bias=bias) # This is the only trainable perceptron
     
     def generatePermutations(self, inputs):
+        # This will make a fixed list of weights for the input layer
         self.permutations = []
         for i in range(2**inputs):
+            # bin(i) returns a string of the binary representation of i, format is 0bxxxx
+            # We take the substring from the 2nd character to the end and fill it with 0s to make it of length inputs
             self.permutations.append([int(x) for x in bin(i)[2:].zfill(inputs)])
         for i in range(2**inputs):
-            self.permutations[i] = [self.permutations[i][j] * 2 - 1 for j in range(inputs)]
+            self.permutations[i] = [self.permutations[i][j] * 2 - 1 for j in range(inputs)] # Convert to range -1 to 1
     
     def makeInputLayer(self, inputs):
         self.inputLayer = []
@@ -84,8 +89,18 @@ class networkPerceptron():
     
     def model(self, x):
         result = self.outputPerceptron.model(self.inputLayerOutput(x))
-        result = 1 if result == 1 else -1
+        result = 1 if result == 1 else -1 # Because perceptron output 1 or 0
         return result
+    
+    def fit(self, X, Y):
+        Y_hat = self.predict(X)
+        while Y_hat != Y:
+            for j in range(len(Y)):
+                if Y[j] == Y_hat[j]: continue
+                for i in range(len(self.outputPerceptron.weights)):
+                    self.outputPerceptron.weights[i] += (Y[j] - Y_hat[j]) * self.inputLayerOutput(X[j])[i]
+                    self.outputPerceptron.bias += (Y[j] - Y_hat[j])
+            Y_hat = self.predict(X)
     
     def predict(self, X):
         Y = []
@@ -104,12 +119,12 @@ class sigmoidNeuron():
             self.weights = weights
         else:
             self.weights = np.random.rand(inputs)
-            self.weights = self.weights * 2 - 1
+            self.weights = self.weights * 2 - 1 # Random weights between -1 and 1
         if bias is not None:
             self.bias = bias
         else:
             self.bias = np.random.rand()
-            self.bias = self.bias * 2 - 1
+            self.bias = self.bias * 2 - 1 # Random bias between -1 and 1
     
     def model(self, x):
         result = sum([x[i]*self.weights[i] for i in range(len(x))]) + self.bias
@@ -136,15 +151,15 @@ class sigmoidNeuron():
     
     def fit(self, X, Y, epochs=100, lr=0.1, printAt=10):
         for i in range(epochs):
-            print(self.weights, self.bias)
+            #print(self.weights, self.bias)
             loss = self.loss(X, Y)
             if i%printAt == 0: print("Epoch:", i, "Loss:", loss)
-            print(self.predict(X))
+            #print(self.predict(X))
             for j in range(len(Y)):
                 weightD, biasD = self.sigmoidDerivative(X[j], Y[j])
                 self.weights -= np.multiply(lr, weightD)
                 self.bias -= np.multiply(lr, biasD)
-        print(self.weights, self.bias)
+        #print(self.weights, self.bias)
 
 
 def mpNeuronTest():
@@ -184,14 +199,17 @@ def networkTest():
     But, it is still capable of implementing any boolean function.
     Below is the XOR gate.
     """
-    network = networkPerceptron(inputs=2, weights=[-1, 0, 0, -1], bias=-1)
+    #network = networkPerceptron(inputs=2, weights=[-1, 0, 0, -1], bias=-1) This will also make a XOR gate
+    network = networkPerceptron(inputs=2)
     X = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
-    Y = network.predict(X)
+    Y = [1, -1, -1, 1]
+    network.fit(X, Y)
     for i in range(2**network.inputs):
         print("Input weights:", network.inputLayer[i].weights, "Input bias:", network.inputLayer[i].bias)
     print("Output weights:", network.outputPerceptron.weights, "Output bias:", network.outputPerceptron.bias)
+    Yhat = network.predict(X)
     for i in range(len(X)):
-        print(X[i], Y[i])
+        print(X[i], Yhat[i])
 
 def sigmoidTest():
     """
@@ -224,9 +242,5 @@ def sigmoidTest():
 def main():
     #mpNeuronTest()
     #perceptronTest()
-    #networkTest()
-    sigmoidTest()
-    
-
-if __name__ == '__main__':
-    main()
+    networkTest()
+    #sigmoidTest()
