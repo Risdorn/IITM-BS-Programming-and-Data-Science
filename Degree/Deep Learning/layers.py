@@ -132,37 +132,192 @@ class rnnLayer(defaultLayer):
     def __init__(self, input_size: int, hidden_size: int, output_size: int):
         np.random.seed(0)
         # U, c
-        self.input_weights = np.random.randn(input_size, hidden_size)* np.sqrt(2. / input_size)
-        self.input_bias = np.random.randn(1, hidden_size)* np.sqrt(2. / input_size)
+        self.input_weights = np.random.randn(hidden_size, input_size)* np.sqrt(2. / input_size)
+        self.input_bias = np.random.randn(hidden_size, 1)* np.sqrt(2. / input_size)
         # W
         self.hidden_weights = np.random.randn(hidden_size, hidden_size)* np.sqrt(2. / input_size)
         # V, b
-        self.output_weights = np.random.randn(hidden_size, output_size)* np.sqrt(2. / input_size)
-        self.output_bias = np.random.randn(1, output_size)* np.sqrt(2. / input_size)
-        self.inputs = None
+        self.output_weights = np.random.randn(output_size, hidden_size)* np.sqrt(2. / input_size)
+        self.output_bias = np.random.randn(output_size, 1)* np.sqrt(2. / input_size)
+        self.inputs = []
         self.outputs = []
-        self.hidden = [np.zeros((1, hidden_size))]
-        self.dL_dV = None
-        self.dL_db = None
-        self.dL_dW = None
-        self.dL_dU = None
-        self.dL_dc = None
+        self.hidden = [np.zeros((hidden_size, 1))]
+        self.dL_dV = np.zeros(self.output_weights.shape)
+        self.dL_db = np.zeros(self.output_bias.shape)
+        self.dL_dW = np.zeros(self.hidden_weights.shape)
+        self.dL_dU = np.zeros(self.input_weights.shape)
+        self.dL_dc = np.zeros(self.input_bias.shape)
+        self.dL_dh_next = np.zeros((hidden_size, 1))
     
     def forward_step(self, input):
-        h = np.dot(input, self.input_weights) + self.input_bias # Ux + c
-        h += np.dot(self.hidden[-1], self.hidden_weights) # Ws
+        input = input.reshape(-1, 1)
+        #print(input.shape, self.input_weights.shape)
+        #print(np.dot(self.input_weights, input).shape, self.input_bias.shape)
+        h = np.dot(self.input_weights, input) + self.input_bias # Ux + c
+        #print(h.shape)
+        h += np.dot(self.hidden_weights, self.hidden[-1]) # Ws
+        #print(h.shape)
         self.hidden.append(np.tanh(h)) # s = tanh(Ux + Ws + c)
-        out = np.dot(self.hidden[-1], self.output_weights) + self.output_bias # Vs + b
+        #print("hidden state s: ", np.sum(self.hidden[-1]))
+        out = np.dot(self.output_weights, self.hidden[-1]) + self.output_bias # Vs + b
+        #print(out.shape)
         softmax = np.exp(out) / np.sum(np.exp(out)) # softmax(Vs + b)
         self.outputs.append(softmax)
-        return
+        result = np.zeros(softmax.shape)
+        #print(result)
+        result[np.argmax(softmax)] = 1
+        return result
     
-    def forward(self, inputs):
+    def forward(self, input, time_steps):
+        # This is in auto-regressive mode
+        self.inputs = []
+        self.outputs = []
+        #self.hidden = [np.zeros(self.hidden[0].shape)]
+        self.inputs.append(input)
+        #self.inputs = inputs
+        for time in range(time_steps):
+            input = self.forward_step(input) # Output from the forward step is input to the next step
+            self.inputs.append(input)
+        self.inputs.pop(-1) # We remove the last input as it is not needed
+        return self.outputs # We return softmax outputs
+    
+    def forward_constant(self, inputs, time_steps):
         self.inputs = inputs
-        for input in inputs:
-            self.forward_step(input)
+        self.outputs = []
+        #self.hidden = [np.zeros(self.hidden[0].shape)]
+        for time in range(time_steps):
+            self.forward_step(self.inputs[time])
         return self.outputs
     
-    def backward(self, output_grad):
-        pass
+    def backward_step(self, output_grad, time):
+        # Gradient for the softmax layer
+        dL_do = output_grad[time]
         
+        # Gradient for output weights and bias, V and b
+        self.dL_dV += np.dot(dL_do, self.hidden[time+1].T)
+        self.dL_db += dL_do
+        
+        # Gradient w.r.t hidden state, s
+        dL_ds = np.dot(self.output_weights.T, dL_do) + self.dL_dh_next
+        
+        # Gradient through tanh
+        dL_dh = (1 - self.hidden[time+1] ** 2) * dL_ds
+        
+        # Gradient for hidden weights, W
+        self.dL_dW += np.dot(dL_dh, self.hidden[time].T)
+        
+        # Gradient for input weights and bias, U and c
+        self.dL_dU += np.dot(dL_dh, self.inputs[time].T)
+        self.dL_dc += dL_dh
+        
+        # Gradient for the previous hidden state
+        self.dL_dh_next = np.dot(self.hidden_weights.T, dL_dh)
+        
+        # Gradient for the input
+        return np.dot(self.input_weights.T, dL_dh)
+    
+    def backward(self, output_grad):
+        time_steps = len(self.inputs)
+        #print(len(self.hidden)) # this should be equal to time_steps + 1
+        input_gradients = []
+        for time in reversed(range(time_steps)):
+            input_gradient = self.backward_step(output_grad, time)
+            input_gradients.append(input_gradient)
+        return input_gradients # We return the gradients for the input
+    
+    def update(self, lr: float):
+        # Update the weights and biases
+        self.input_weights -= lr * self.dL_dU
+        self.input_bias -= lr * self.dL_dc
+        self.hidden_weights -= lr * self.dL_dW
+        self.output_weights -= lr * self.dL_dV
+        self.output_bias -= lr * self.dL_db
+        # Reset the gradients
+        self.dL_dV = np.zeros(self.output_weights.shape)
+        self.dL_db = np.zeros(self.output_bias.shape)
+        self.dL_dW = np.zeros(self.hidden_weights.shape)
+        self.dL_dU = np.zeros(self.input_weights.shape)
+        self.dL_dc = np.zeros(self.input_bias.shape)
+        self.dL_dh_next = np.zeros(self.hidden[0].shape)
+        self.dL_dh = None
+        self.inputs = []
+        self.outputs = []
+        self.hidden = [np.zeros(self.hidden[0].shape)]
+
+class rnnEncoder(defaultLayer):
+    def __init__(self, input_size: int, hidden_size: int, output_size: int):
+        np.random.seed(0)
+        # U, c
+        self.input_weights = np.random.randn(hidden_size, input_size)* np.sqrt(2. / input_size)
+        self.input_bias = np.random.randn(hidden_size, 1)* np.sqrt(2. / input_size)
+        # W
+        self.hidden_weights = np.random.randn(hidden_size, hidden_size)* np.sqrt(2. / input_size)
+        self.inputs = []
+        self.hidden = [np.zeros((hidden_size, 1))]
+        self.dL_dW = np.zeros(self.hidden_weights.shape)
+        self.dL_dU = np.zeros(self.input_weights.shape)
+        self.dL_dc = np.zeros(self.input_bias.shape)
+        self.dL_dh_next = np.zeros((hidden_size, 1))
+    
+    def forward_step(self, input):
+        input = input.reshape(-1, 1)
+        #print(input.shape, self.input_weights.shape)
+        #print(np.dot(self.input_weights, input).shape, self.input_bias.shape)
+        h = np.dot(self.input_weights, input) + self.input_bias # Ux + c
+        #print(h.shape)
+        h += np.dot(self.hidden_weights, self.hidden[-1]) # Ws
+        #print(h.shape)
+        self.hidden.append(np.tanh(h)) # s = tanh(Ux + Ws + c)
+        #print("hidden state s: ", np.sum(self.hidden[-1]))
+        return self.hidden[-1]
+    
+    def forward_constant(self, inputs, time_steps):
+        self.inputs = inputs
+        self.hidden = [np.zeros(self.hidden[0].shape)]
+        for time in range(time_steps):
+            self.forward_step(self.inputs[time])
+        return self.hidden
+    
+    def backward_step(self, time):
+        # Only hidden state gradient is thrown back from the decoder
+        # Gradient w.r.t hidden state, s
+        dL_ds = self.dL_dh_next
+        
+        # Gradient through tanh
+        dL_dh = (1 - self.hidden[time+1] ** 2) * dL_ds
+        
+        # Gradient for hidden weights, W
+        self.dL_dW += np.dot(dL_dh, self.hidden[time].T)
+        
+        # Gradient for input weights and bias, U and c
+        self.dL_dU += np.dot(dL_dh, self.inputs[time].T)
+        self.dL_dc += dL_dh
+        
+        # Gradient for the previous hidden state
+        self.dL_dh_next = np.dot(self.hidden_weights.T, dL_dh)
+        
+        # Gradient for the input
+        return np.dot(self.input_weights.T, dL_dh)
+    
+    def backward(self):
+        time_steps = len(self.inputs)
+        #print(len(self.hidden)) # this should be equal to time_steps + 1
+        input_gradients = []
+        for time in reversed(range(time_steps)):
+            input_gradient = self.backward_step(time)
+            input_gradients.append(input_gradient)
+        return input_gradients # We return the gradients for the input
+    
+    def update(self, lr: float):
+        # Update the weights and biases
+        self.input_weights -= lr * self.dL_dU
+        self.input_bias -= lr * self.dL_dc
+        self.hidden_weights -= lr * self.dL_dW
+        # Reset the gradients
+        self.dL_dW = np.zeros(self.hidden_weights.shape)
+        self.dL_dU = np.zeros(self.input_weights.shape)
+        self.dL_dc = np.zeros(self.input_bias.shape)
+        self.dL_dh_next = np.zeros(self.hidden[0].shape)
+        self.inputs = []
+        self.outputs = []
+        self.hidden = [np.zeros(self.hidden[0].shape)]
