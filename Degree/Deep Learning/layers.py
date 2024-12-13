@@ -127,3 +127,42 @@ class maxPoolingLayer(defaultLayer):
                     
                     input_grad[max_row, max_col, k] += output_grad[i, j, k]
         return input_grad
+
+class rnnLayer(defaultLayer):
+    def __init__(self, input_size: int, hidden_size: int, output_size: int):
+        np.random.seed(0)
+        # U, c
+        self.input_weights = np.random.randn(input_size, hidden_size)* np.sqrt(2. / input_size)
+        self.input_bias = np.random.randn(1, hidden_size)* np.sqrt(2. / input_size)
+        # W
+        self.hidden_weights = np.random.randn(hidden_size, hidden_size)* np.sqrt(2. / input_size)
+        # V, b
+        self.output_weights = np.random.randn(hidden_size, output_size)* np.sqrt(2. / input_size)
+        self.output_bias = np.random.randn(1, output_size)* np.sqrt(2. / input_size)
+        self.inputs = None
+        self.outputs = []
+        self.hidden = [np.zeros((1, hidden_size))]
+        self.dL_dV = None
+        self.dL_db = None
+        self.dL_dW = None
+        self.dL_dU = None
+        self.dL_dc = None
+    
+    def forward_step(self, input):
+        h = np.dot(input, self.input_weights) + self.input_bias # Ux + c
+        h += np.dot(self.hidden[-1], self.hidden_weights) # Ws
+        self.hidden.append(np.tanh(h)) # s = tanh(Ux + Ws + c)
+        out = np.dot(self.hidden[-1], self.output_weights) + self.output_bias # Vs + b
+        softmax = np.exp(out) / np.sum(np.exp(out)) # softmax(Vs + b)
+        self.outputs.append(softmax)
+        return
+    
+    def forward(self, inputs):
+        self.inputs = inputs
+        for input in inputs:
+            self.forward_step(input)
+        return self.outputs
+    
+    def backward(self, output_grad):
+        pass
+        
