@@ -6,23 +6,34 @@ This repository contains the notes and code I have created for practice during m
 
 The repository is organized as follows:
 
-- **Degree**
-  - **AI: SMPS**  
-    This course explores how intelligent agents solve problems. It starts with blind search and moves on to heuristic search, while also studying board games like Chess and Go, logical reasoning, and approaches to domain-independent planning to achieve goals. It concludes with constraint processing as an alternative to combining search and reasoning.
-  - **Deep Learning**  
-    This course covers the basics of Neural Networks, including Convolutional Neural Networks and Recurrent Neural Networks. It also teaches how these models can be applied to solve problems in domains like Computer Vision, Speech, and NLP.
-  - **Software Testing**  
-    This course focuses on the phases of testing based on project requirements. It teaches how to formulate test requirements precisely, design and execute test cases, and apply specialized test case design techniques for specific application domains.
-  - **Software Engineering**  
-    This course teaches essential skills for becoming an effective software engineer, covering fundamental concepts such as requirement gathering, software design, debugging, testing, and deployment practices used in real-world development.
-  - **tex files for all the notes**  
-    LaTeX files for all notes prepared during the courses.
-  - **static**  
-    Contains images and other static resources used in the notes.
-- **head.tex**  
-  Main LaTeX header file used across all notes.
-- **python-cheatsheets.pdf**  
-  A handy reference for Python concepts.
+    .
+    ├── Degree/
+    |   ├── AI: SMPS/
+    |       └── This course explores how intelligent agents solve problems. 
+    |           It starts with blind search and moves on to heuristic search, 
+    |           while also studying board games like Chess and Go, logical reasoning, 
+    |           and approaches to domain-independent planning to achieve goals. 
+    |           It concludes with constraint processing as an alternative to combining search and reasoning.
+    |
+    |   ├── Deep Learning/
+    |       └── This course covers the basics of Neural Networks, including Convolutional Neural Networks 
+    |           and Recurrent Neural Networks. It also teaches how these models can be applied to 
+    |           solve problems in domains like Computer Vision, Speech, and NLP.
+    |
+    |   ├── Software Testing/
+    |       └── This course focuses on the phases of testing based on project requirements. 
+    |           It teaches how to formulate test requirements precisely, design and execute test cases, 
+    |           and apply specialized test case design techniques for specific application domains.
+    |
+    |   ├── Software Engineering/
+    |       └── This course teaches essential skills for becoming an effective software engineer, 
+    |           covering fundamental concepts such as requirement gathering, software design, debugging, testing, 
+    |           and deployment practices used in real-world development.
+    |
+    |   ├── static/                            # Contains images and other static resources used in the notes.
+    |   ├── tex files for all notes            # LaTeX files for all notes prepared during the courses.
+    ├── head.tex                               # Main LaTeX header file used across all notes.
+    ├── python-cheatsheets.pdf                 # A handy reference for Python concepts.
 
 Each course folder contains its respective notes, codes, and additional resources related to the topics covered.
 
