@@ -30,12 +30,29 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{listings}
+\usepackage{tikz-qtree}
+\usepackage[table]{xcolor}
+\usepackage{stackengine} 
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcommand\oast{\stackMath\mathbin{\stackinset{c}{0ex}{c}{0ex}{\ast}{\bigcirc}}}
+
 \usetikzlibrary{shapes.geometric, arrows}
 \usetikzlibrary{positioning}
-\usepackage[table]{xcolor}
+\usetikzlibrary{calc}
+\usetikzlibrary{trees}
 
 \graphicspath{{./static/}}
 \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt
+\tikzset{
+  % Two node styles for game trees: solid and hollow
+  solid node/.style={circle,draw,inner sep=6.5,fill=black},
+  hollow node/.style={circle,draw,inner sep=6.5},
+  write node/.style={circle,draw,inner sep=4},
+  hollow rect node/.style={rectangle,draw,minimum size=6.5mm},
+  write rect node/.style={rectangle,draw,minimum size=4mm},
+}
 
 \usepackage{pdfpages}
 
