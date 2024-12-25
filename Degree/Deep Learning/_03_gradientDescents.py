@@ -1,24 +1,36 @@
 import numpy as np
 import matplotlib.pyplot as plt
-np.random.seed(0)
 
 def gradientDescent(X, y, batch, gradient, loss, eta = 0.1, kind = "vanilla", beta = 0.1, epochs = 100, printAt = 10):
-    """Gradient descent algorithm
-
-    Args:
-        X (numpy.ndarray): Input data
-        y (numpy.ndarray): Output data
-        batch (int): Batch size
-        gradient (function): Gradient function
-        loss (function): Loss function
-        eta (float, optional): Step Size. Defaults to 0.1.
-        kind (str, optional): Can take values "momentum", "nesterov", or "vanilla". Defaults to "vanilla".
-        beta (float, optional): Momentum/Nesterov parameter. Defaults to 0.1.
-        epochs (int, optional): Number of Epochs. Defaults to 100.
-        printAt (int, optional): Print loss at every printAt epochs. Defaults to 10.
-
-    Returns:
-        numpy.ndarray, numpy.ndarray: Weights and biases
+    """
+    Implement the gradient descent algorithm with different kinds of gradient descent algorithms
+    
+    Parameters
+    ----------
+    X : numpy.ndarray
+        Input data
+    y : numpy.ndarray
+        Output data
+    batch : int
+        Batch size
+    gradient : function
+        Gradient function
+    loss : function
+        Loss function
+    eta : float, optional
+        Step Size. The default is 0.1.
+    kind : str, optional
+        Can take values "momentum", "nesterov", or "vanilla". The default is "vanilla".
+    beta : float, optional
+        Momentum/Nesterov parameter. The default is 0.1.
+    epochs : int, optional
+        Number of Epochs. The default is 100.
+    printAt : int, optional
+        Print loss at every printAt epochs. The default is 10.
+    
+    Returns
+    -------
+    numpy.ndarray, numpy.ndarray
     """
     # Check if the kind is valid
     if kind not in ["momentum", "nesterov", "vanilla"]: raise ValueError("Invalid kind")
@@ -80,30 +92,44 @@ def gradientDescent(X, y, batch, gradient, loss, eta = 0.1, kind = "vanilla", be
     return weights, bias
 
 def loss(X, y, weights, bias):
-    """Loss function
-
-    Args:
-        X (numpy.ndarray): Input data
-        y (numpy.ndarray): Output data
-        weights (numpy.ndarray): Weights
-        bias (numpy.ndarray): Bias
-
-    Returns:
-        float: Loss
+    """
+    Loss function
+    
+    Parameters
+    ----------
+    X : numpy.ndarray
+        Input data
+    y : numpy.ndarray
+        Output data
+    weights : numpy.ndarray
+        Weights
+    bias : numpy.ndarray
+        Bias
+        
+    Returns
+    -------
+    float
     """
     return np.sum((y - np.dot(X, weights) - bias)**2) / X.shape[0]
 
 def gradient(X, y, weights, bias):
-    """Gradient function
-
-    Args:
-        X (numpy.ndarray): Input data
-        y (numpy.ndarray): Output data
-        weights (numpy.ndarray): Weights
-        bias (numpy.ndarray): Bias
-
-    Returns:
-        numpy.ndarray, numpy.ndarray: Gradient of weights and biases
+    """
+    Gradient function
+    
+    Parameters
+    ----------
+    X : numpy.ndarray
+        Input data
+    y : numpy.ndarray
+        Output data
+    weights : numpy.ndarray
+        Weights
+    bias : numpy.ndarray
+        Bias
+        
+    Returns
+    -------
+    numpy.ndarray, numpy.ndarray
     """
     dL_dW = -2 * np.dot(X.T, y - np.dot(X, weights) - bias) / X.shape[0]
     dL_db = -2 * np.sum(y - np.dot(X, weights) - bias) / X.shape[0]

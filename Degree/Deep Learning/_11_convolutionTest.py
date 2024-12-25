@@ -1,16 +1,16 @@
-from adaptiveLearningRates import main
+from _04_adaptiveLearningRates import main
 import matplotlib.pyplot as plt
 import numpy as np
-from layers import artificialNeuronLayer, convolutionLayer, maxPoolingLayer
+from _06_layers import artificialNeuronLayer, convolutionLayer, maxPoolingLayer
 
 class CNN():
     def __init__(self, output_size: int):
-        self.conv1 = convolutionLayer(3, depth=3, out_depth=10, stride=1)
+        self.conv1 = convolutionLayer(3, depth=3, out_depth=10, stride=1, random_seed=0)
         self.pool1 = maxPoolingLayer(2, 2)
-        self.conv2 = convolutionLayer(3, depth=10, out_depth=20, stride=1)
+        self.conv2 = convolutionLayer(3, depth=10, out_depth=20, stride=1, random_seed=0)
         self.pool2 = maxPoolingLayer(2, 2)
-        self.fc1 = artificialNeuronLayer(46*65*20, 128)
-        self.fc2 = artificialNeuronLayer(128, output_size)
+        self.fc1 = artificialNeuronLayer(46*65*20, 128, random_seed=0)
+        self.fc2 = artificialNeuronLayer(128, output_size, random_seed=0)
     
     def forward(self, input: float) -> float:
         x = self.conv1.forward(input)

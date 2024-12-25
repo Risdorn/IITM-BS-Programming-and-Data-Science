@@ -1,4 +1,4 @@
-from layers import rnnLayer
+from _06_layers import rnnLayer
 import numpy as np
 
 parameters = np.load('Degree/Deep Learning/parameters_rnn.npz')
@@ -18,7 +18,7 @@ for i in range(5):
 input_size = 5
 hidden_size = 5
 output_size = 5
-rnnModel = rnnLayer(input_size, hidden_size, output_size)
+rnnModel = rnnLayer(input_size, hidden_size, output_size, random_seed=0)
 rnnModel.input_weights = parameters.get('U')
 rnnModel.input_bias = np.zeros((hidden_size, 1))
 rnnModel.hidden_weights = parameters.get('W')

@@ -1,5 +1,8 @@
 import numpy as np
 
+# This file contains different methods to represent words in a corpus
+# One hot encoding, PPMI, SVD, Bag of words model
+
 corpus = [
     "The quick brown fox jumps over the lazy dog.",
     "Artificial intelligence is transforming the way we live and work.",

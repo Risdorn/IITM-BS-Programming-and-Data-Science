@@ -15,10 +15,16 @@ The repository is organized as follows:
     |           and approaches to domain-independent planning to achieve goals. 
     |           It concludes with constraint processing as an alternative to combining search and reasoning.
     |
+    |   ├── Corporate Finance/
+    |
     |   ├── Deep Learning/
     |       └── This course covers the basics of Neural Networks, including Convolutional Neural Networks 
     |           and Recurrent Neural Networks. It also teaches how these models can be applied to 
     |           solve problems in domains like Computer Vision, Speech, and NLP.
+    |
+    |   ├── Managerial Economics/
+    |
+    |   ├── Reinforcement Learning/
     |
     |   ├── Software Testing/
     |       └── This course focuses on the phases of testing based on project requirements. 

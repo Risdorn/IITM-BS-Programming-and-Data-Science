@@ -1,4 +1,4 @@
-from layers import rnnLayer, rnnEncoder
+from _06_layers import rnnLayer, rnnEncoder
 import numpy as np
 
 parameters = np.load('Degree/Deep Learning/parameters_w11.npz')
@@ -22,8 +22,8 @@ input_size = 5
 hidden_size = 5
 output_size = 5
 # encoder and decoder models
-encoderModel = rnnEncoder(input_size, hidden_size, output_size)
-decoderModel = rnnLayer(input_size, hidden_size, output_size)
+encoderModel = rnnEncoder(input_size, hidden_size, output_size, random_seed=0)
+decoderModel = rnnLayer(input_size, hidden_size, output_size, random_seed=0)
 encoderModel.input_weights = parameters.get('U_e')
 encoderModel.input_bias = np.zeros((hidden_size, 1))
 encoderModel.hidden_weights = parameters.get('W_e')

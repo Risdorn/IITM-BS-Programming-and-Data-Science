@@ -1,9 +1,78 @@
-from layers import artificialNeuronLayer
+from _06_layers import artificialNeuronLayer
 import numpy as np
 import matplotlib.pyplot as plt
 
 class adaptiveLearningRate():
+    """
+    Implement a neural network with adaptive learning rates using different methods.
+    
+    Attributes
+    ----------
+    layers : list
+        List of artificialNeuronLayer objects representing the layers of the neural network.
+    vt : list
+        List of numpy.ndarray representing the vt for each layer.
+    mt : list
+        List of numpy.ndarray representing the mt for each layer.
+    outputLayer : artificialNeuronLayer
+        The output layer of the neural network.
+    updateType : str
+        The type of update to use.
+    k : int
+        The index of the vt and mt that is being used in the update method.
+    t : int
+        The time step.
+    beta1 : float
+        The beta1 parameter, also used as beta in some methods.
+    beta2 : float
+        The beta2 parameter.
+    eta : float
+        The learning rate.
+    
+    Methods
+    -------
+    forward(input)
+        Forward pass through the neural network.
+    backward(output_grad)
+        Backward pass through the neural network.
+    update()
+        Update the weights and bias of the neural network.
+    adaGrad(grad)
+        AdaGrad update method.
+    rmsProp(grad)
+        RMSProp update method.
+    adaDelta(grad)
+        AdaDelta update method.
+    adam(grad)
+        Adam update method.
+    maxProp(grad)
+        MaxProp update method.
+    adaMax(grad)
+        AdaMax update method.
+    Nadam(grad)
+        Nadam update method.
+    default(grad)
+        Default update method, equivalent to vanilla gradient descent.
+    """
     def __init__(self, input_size: int, hidden_size: list, output_size: int, updateType: str = 'default'):
+        """
+        Constructor for the adaptiveLearningRate class.
+
+        Parameters
+        ----------
+        input_size : int
+            The number of input neurons.
+        hidden_size : list
+            List of integers representing the number of neurons in each hidden layer.
+        output_size : int
+            The number of output neurons.
+        updateType : str, optional
+            The type of update to use. The default is 'default'. Can take values 'adaGrad', 'rmsProp', 'adaDelta', 'adam', 'maxProp', 'adaMax', 'Nadam', 'default'.
+            
+        Returns
+        -------
+        None
+        """
         assert updateType in ['adaGrad', 'rmsProp', 'adaDelta', 'adam', 'maxProp', 'adaMax', 'Nadam', 'default']
         assert len(hidden_size) > 0
         self.layers = []
@@ -11,16 +80,16 @@ class adaptiveLearningRate():
         self.mt = []
         for i in range(len(hidden_size)):
             if i == 0:
-                self.layers.append(artificialNeuronLayer(input_size, hidden_size[i]))
+                self.layers.append(artificialNeuronLayer(input_size, hidden_size[i], 0))
                 #print("Layer 0 weight and bias size: ", self.layers[0].weights.shape, self.layers[0].bias.shape)
                 self.vt.append(np.zeros((input_size+1, hidden_size[i]))) # We add 1 to the input size to account for the bias
                 self.mt.append(np.zeros((input_size+1, hidden_size[i])))
             else:
-                self.layers.append(artificialNeuronLayer(hidden_size[i - 1], hidden_size[i]))
+                self.layers.append(artificialNeuronLayer(hidden_size[i - 1], hidden_size[i], 0))
                 #print("Layer ", i, " weight and bias size: ", self.layers[i].weights.shape, self.layers[i].bias.shape)
                 self.vt.append(np.zeros((hidden_size[i - 1]+1, hidden_size[i])))
                 self.mt.append(np.zeros((hidden_size[i - 1]+1, hidden_size[i])))
-        self.outputLayer = artificialNeuronLayer(hidden_size[-1], output_size)
+        self.outputLayer = artificialNeuronLayer(hidden_size[-1], output_size, 0)
         #print("Output Layer weight and bias size: ", self.outputLayer.weights.shape, self.outputLayer.bias.shape)
         self.vt.append(np.zeros((hidden_size[-1]+1, output_size)))
         self.mt.append(np.zeros((hidden_size[-1]+1, output_size)))
@@ -32,6 +101,18 @@ class adaptiveLearningRate():
         self.eta = 1e-3 # corresponds to lr in all the methods
     
     def forward(self, input: float) -> float:
+        """
+        Forward pass through the neural network.
+
+        Parameters
+        ----------
+        input : float
+            The input to the neural network.
+
+        Returns
+        -------
+        float
+        """
         x = input
         for layer in self.layers:
             x = layer(x)
@@ -41,6 +122,18 @@ class adaptiveLearningRate():
         return x
     
     def backward(self, output_grad: float) -> float:
+        """
+        Backward pass through the neural network.
+
+        Parameters
+        ----------
+        output_grad : float
+            The gradient of the output.
+
+        Returns
+        -------
+        float
+        """
         output_grad = self.outputLayer.backward(output_grad)
         for layer in reversed(self.layers):
             output_grad *= (output_grad > 0) # ReLU derivative
@@ -48,7 +141,14 @@ class adaptiveLearningRate():
         return output_grad
     
     def update(self):
-        method = getattr(self, self.updateType)
+        """
+        Update the weights and bias of the neural network.
+        
+        Returns
+        -------
+        None
+        """
+        method = getattr(self, self.updateType) # Get the method to use
         self.t += 1
         for layer in self.layers:
             weights = np.concatenate((layer.weights, layer.bias), axis = 0)
@@ -63,41 +163,64 @@ class adaptiveLearningRate():
         self.k = 0
     
     def adaGrad(self, grad):
+        # vt = vt + grad**2
         self.vt[self.k] += grad**2
+        # dw = eta / sqrt(vt + 1e-8) * grad
         return self.eta / np.sqrt(self.vt[self.k] + 1e-8) * grad
     
     def rmsProp(self, grad):
-        self.vt[self.k] = self.beta1 * self.vt[self.k] + (1 - self.beta1) * grad**2 # beta1 is beta
+        # vt = beta1 * vt + (1 - beta1) * grad**2
+        self.vt[self.k] = self.beta1 * self.vt[self.k] + (1 - self.beta1) * grad**2
+        # dw = eta / sqrt(vt + 1e-8) * grad
         return (self.eta / np.sqrt(self.vt[self.k] + 1e-8)) * grad
     
     def adaDelta(self, grad):
-        self.vt[self.k] = self.beta1 * self.vt[self.k] + (1 - self.beta1) * grad**2 # beta1 is beta
-        dw = np.sqrt(self.mt[self.k] + 1e-8) / np.sqrt(self.vt[self.k] + 1e-8) * grad # mt is ut
+        # vt = beta1 * vt + (1 - beta1) * grad**2
+        self.vt[self.k] = self.beta1 * self.vt[self.k] + (1 - self.beta1) * grad**2
+        # dw = sqrt(mt + 1e-8) / sqrt(vt + 1e-8) * grad
+        dw = np.sqrt(self.mt[self.k] + 1e-8) / np.sqrt(self.vt[self.k] + 1e-8) * grad
+        # mt = beta1 * mt + (1 - beta1) * dw**2
         self.mt[self.k] = self.beta1 * self.mt[self.k] + (1 - self.beta1) * dw**2
         return dw
     
     def adam(self, grad):
+        # mt = beta1 * mt + (1 - beta1) * grad
         self.mt[self.k] = self.beta1 * self.mt[self.k] + (1 - self.beta1) * grad
+        # m_hat = mt / (1 - beta1**t)
         m_hat = self.mt[self.k] / (1 - self.beta1**self.t)
+        # vt = beta2 * vt + (1 - beta2) * grad**2
         self.vt[self.k] = self.beta2 * self.vt[self.k] + (1 - self.beta2) * grad**2
+        # v_hat = vt / (1 - beta2**t)
         v_hat = self.vt[self.k] / (1 - self.beta2**self.t)
+        # dw = eta / (sqrt(v_hat) + 1e-8) * m_hat
         return (self.eta / (np.sqrt(v_hat) + 1e-8)) * m_hat
     
     def maxProp(self, grad):
-        self.vt[self.k] = np.maximum(self.beta1 * self.vt[self.k], abs(grad)) # beta1 is beta
+        # vt = max(beta1 * vt, |grad|)
+        self.vt[self.k] = np.maximum(self.beta1 * self.vt[self.k], abs(grad))
+        # dw = eta / (vt + 1e-8) * grad
         return (self.eta / (self.vt[self.k] + 1e-8)) * grad
         
     def adaMax(self, grad):
+        # mt = beta1 * mt + (1 - beta1) * grad
         self.mt[self.k] = self.beta1 * self.mt[self.k] + (1 - self.beta1) * grad
+        # m_hat = mt / (1 - beta1**t)
         m_hat = self.mt[self.k] / (1 - self.beta1**self.t)
+        # vt = max(beta2 * vt, |grad|)
         self.vt[self.k] = np.maximum(self.beta2 * self.vt[self.k], abs(grad))
+        # dw = eta / (vt + 1e-8) * m_hat
         return (self.eta / (self.vt[self.k] + 1e-8)) * m_hat
     
     def Nadam(self, grad):
+        # mt = beta1 * mt + (1 - beta1) * grad
         self.mt[self.k] = self.beta1 * self.mt[self.k] + (1 - self.beta1) * grad
+        # m_hat = mt / (1 - beta1**t)
         m_hat = self.mt[self.k] / (1 - self.beta1**self.t)
+        # vt = beta2 * vt + (1 - beta2) * grad**2
         self.vt[self.k] = self.beta2 * self.vt[self.k] + (1 - self.beta2) * grad**2
+        # v_hat = vt / (1 - beta2**t)
         v_hat = self.vt[self.k] / (1 - self.beta2**self.t)
+        # dw = (eta / sqrt(v_hat) + 1e-8) * (m_hat + ((1 - beta1) * grad / (1 - beta1**t)))
         dw = (self.eta / np.sqrt(v_hat) + 1e-8) * (m_hat + ((1 - self.beta1) * grad / (1 - self.beta1**self.t)))
         return dw
     
