@@ -1,0 +1,697 @@
+\documentclass[a4paper]{article}
+\input{head}
+
+\begin{document}
+
+\fancyhead[c]{}
+\hrule \medskip
+\begin{minipage}{0.195\textwidth}
+\raggedright
+Rishabh Indoria\\
+21F3001823
+\end{minipage}
+\begin{minipage}{0.6\textwidth}
+\centering
+\LARGE
+Deep Learning Practice
+\end{minipage}
+\begin{minipage}{0.195\textwidth}
+\raggedleft
+\today \hfill \\
+\end{minipage}
+\medskip \hrule
+\bigskip
+
+\section{Hugging Face Basics}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Degree//static/DLP_HF_summary.png}
+    \caption{HF Summary}
+\end{figure}
+\subsection{Datasets}
+\begin{itemize}
+    \item The datasets come with different formats and different sizes
+    \item We need to understand the format and may need to write a script to parse and load the text data.
+    \item If the memory is limited, we need to implement mechanisms to stream the samples in the dataset.
+    \item However, it would be convenient if we have a single place to load any of these datasets with a consistent call signature.
+    \item The \verb|datasets| module provides a simple interface to download a specific dataset from thousands of available datasets on HF.
+    \item When we download the dataset for the first time, it will be cached locally.
+    \item The cached data is stored in a memory-mapped columnar format, which uses less memory.
+    \item Before using \verb|datasets| module, make sure to run the following commands for nlp, audio and vision.\\
+    \verb|pip install datasets|, \verb|pip install datasets[audio]|, \verb|pip install datasets[vision]|
+    \item Let us first download a small dataset of movie reviews used in supervised learning.
+    \vspace{-1mm}
+    \begin{verbatim}
+        from datasets import load_dataset
+        imdb_dataset = load_dataset("stanfordnlp/imdb")
+    \end{verbatim}
+    \vspace{-7mm}
+    \item Notice the structure: the "train" and "test" splits are wrapped by the \verb|DatasetDict| class.
+    \item Each split is an instance of the \verb|Dataset| class and contains two fields: $features$ and $num\_rows$.
+    \item Only train set can be extracted by \verb|imdb_train_split = imdb_dataset["train]|
+    \item We can remove the third split, $unsupervised$, by using \verb|_ = imdb_dataset.pop("unsupervised")|
+    \item If we want to download the train split alone,\\
+    \verb|train_split = load_dataset("stanfordnlp/imdb", split = "train")|
+    \item We can divide the split further into "train" and "test"(evaluation) splits,\\
+    \verb|small_ds = train_split.train_test_split(test_size = 0.2)|
+    \item Suppose we have two files, namely "tain.csv" and "test.csv" in a directory named "data".
+    \vspace{-1mm}
+    \begin{verbatim}
+        data_files = ["data/train.csv", "data/test.csv"]
+        local_dataset = load_dataset("csv", data_files = data_files)
+    \end{verbatim}
+    \vspace{-7mm}
+    \item We can convert the dataset from any format to $pyarrow$ format by saving it to the disk.\\
+    \verb|train_test_split = local_dataset["train"].train_test_split(test_size = 0.2)|\\
+    \verb|train_test_splits.save_to_disk('pyarrow_dataset/movie_review')|
+    \item Now we can load from the disk
+    \vspace{-1mm}
+    \begin{verbatim}
+        from datasets import load_from_disk
+        raw_dataset_from_disk = load_from_disk('pyarrow_dataset/movie_review')
+    \end{verbatim}
+    \vspace{-7mm}
+    \item We can select a specific sample, \verb|example = imdb_dataset["train"][idx]|
+    \item We can also pass a list of indices, \verb|example = imdb_dataset["train"].select([idx])|
+    \item \textbf{Translation Dataset}: we will take a look at "wmt/wmt14" which contains 5 sub-datasets.\\
+    \verb|from datasets import get_dataset_config_names, get_dataset_split_names|, used to see what splits the dataset has.\\
+    \verb|translation_dataset = load_dataset(path = "wmt/wmt14", name = "hi-en")|
+    \item We can combine all samples,\\
+    \verb|translation_dataset=load_dataset(path="wmt/wmt14",name="hi-en",split="train+test+validation")|
+    \item Features defines the internal structure of a dataset. It is used to specify the underlying serialization format.
+    \item Another dataset is Microsoft Research Paraphrase Corpus(MRPC)\\
+    \verb|mrpc_dataset = load_dataset('glue', 'mrpc', split = 'train')|
+    \item We can filter the dataset based on certain conditions,\\
+    \verb|imdb_filtered_dataset=imdb_dataset.filter(|\\
+    \verb|lambda examples:len(example['text'].split(' ')>=num_words))|
+    \item We can also use map
+    \vspace{-1mm}
+    \begin{verbatim}
+        def add_prefix(example):
+            example["text"] = "IMDB:"+example["text"]
+            return example
+
+        imdb_prefixed_dataset = imdb_dataset.map(add_prefix)
+    \end{verbatim}
+    \vspace{-7mm}
+    \item Often we need to combine two or more datasets to create a larger dataset.
+    \item The only requirement is that the datasets must have same features and same number of splits.\\
+    \verb|concat_dataset = datasets.concatenate_datasets(imdb_dataset_whole, rt_dataset_whole, axis = 0)|
+    \item Often we have $n$ skewed datasets, so we need to build a new dataset by intervening the samples from the dataset according to its distribution.
+    \vspace{-1mm}
+    \begin{verbatim}
+        from datasets import interleave_datasets
+        inter_datasets = interleave_datasets([imdb_dataset_whole, rt_dataset_whole],
+                                                probabilities = [0.6,0.4])
+    \end{verbatim}
+    \vspace{-7mm}
+    \item By default, \verb|stopping_strategy=first_exhausted|, construction is stopped as soon as one of the datasets runs out of sample.
+    \item \textbf{Iterable Dataset}: Suitable for loading samples from large datasets iteratively without writing anything to local disk.\\
+    \verb|imdb_iter_dataset = load_dataset("stanfordnlp/imdb", split = "train", streaming = True)|
+    \item Can we load a dataset directly from external links?
+    \item Can we load a dataset from a zipped file directly?
+    \item Colab Notebook: \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/Datasets.ipynb}
+    \item Week 1 assignment: \url{https://colab.research.google.com/drive/13Cx57lk5cZ1m_2tjHA3ABKDhrnO3wzjb}
+\end{itemize}
+
+\subsection{Tokenization}
+\begin{itemize}
+    \item The tokenizer simply splits the input sequence into tokens.
+    \item A simple approach is to use whitespace for splitting the text.
+    \item Each token is associated with a unique ID.
+    \item Each ID is associated with a unique embedding vector.
+    \item The model then takes embeddings and predicts token IDs.
+    \item During inference, the predicted token IDs are converted back to tokens and then to words.
+    \item The size of the vocabulary determines the size of the embedding table.
+    \item We can split the text into words using whitespace, pre-tokenization, and add all unique words in the corpus to the vocabulary.
+    \item We also include special tokens such as $\langle$go$\rangle$, $\langle$stop$\rangle$, $\langle$mask$\rangle$, $\langle$cls$\rangle$ and others to the vocabulary based on the type of downstream tasks and architecture choice.
+    \item \textbf{Challenges in building a vocabulary}
+    \begin{enumerate}
+        \item \textbf{What should be the size of vocabulary?}: Larger the size, larger the size of embedding matrix and greater the complexity of computing the softmax probabilities. What is the optimal size?
+        \item \textbf{Out-of-vocabulary}: If we limit the size of the vocabulary (say, 250K to 50K), then we need a mechanism to handle out-of-vocabulary (OOV) words. How do we handle them?
+        \item \textbf{Handling misspelled words in corpus}: Often, the corpus is built by scraping the web. There are chances of typo/spelling errors. Such erroneous words should not be considered as unique words.
+        \item \textbf{Open Vocabulary problem}: A new word can be constructed (say, in agglutinative languages) by combining existing words. The vocabulary, in principle, is infinite (that is, names, numbers, ...) which makes a task like machine translation challenging
+    \end{enumerate}
+    \item We want a Moderate-sized Vocabulary, to Efficiently handle unknown words during inference, and Be language agnostic
+    \item Tokenization can be character level, sub-word level, and word level.
+    \item \textbf{General Pre-processing}: First the text is normalized which involves operations such as treating cases, removing accents, eliminating multiple whitespace, handling HTML tags, etc.
+    \item Splitting the text by a whitespace was traditionally called tokenization. However, when it is used with a sub-word tokenization algorithm, it is called \textbf{pre-tokenization}.
+    \item Learn the vocabulary(training) using these words.
+    \item \textbf{Byte Pair Encoding}
+    \begin{enumerate}
+        \item Starts with a dictionary that contains words and their count.
+        \item Append a special symbol $\langle/$w$\rangle$ at the end of each word in the dictionary.
+        \item Set required number of merges, a hyperparameter
+        \item Initialize the character-frequency table, a base vocabulary
+        \item Get the frequency count for a pair of characters
+        \item Merge pairs with maximum occurrence
+    \end{enumerate}
+    \vspace{-1mm}
+    \begin{verbatim}
+        import re, collections
+        def get_stats(vocab):
+            pairs = collecitons.defaultdict(int)
+            for word, freq in vocab.items():
+                symbols = word.split()
+                for i in range(len(symbols)-1):
+                    pairs[symbols[i],symbols[i+1]] += freq
+            return pairs
+
+        def merge_vocab(pair, v_in):
+            v_out = {}
+            bigram = re.escape(' '.join(pair))
+            p = re.compile(r'(?<!\S)' + bigram + r'(?!\S)')
+            for word in v_in:
+                w_out = p.sub(''.join(pair), word)
+                v_out[w_out] = v_in[word]
+            return v_out
+
+        vocab = {'l o w </w>':5, 'l o w e r </w>':2, 'n e w e s t </w>':6, 
+        'w i d e s t </w>':3}
+        num_merges = 10
+
+        for i in range(num_merges):
+            pairs = get_stats(vocab)
+            best = max(pairs, key=pairs.get)
+            vocab = merge_vocab(best, vocab)
+    \end{verbatim}
+    \vspace{-7mm}
+    \item The final vocabulary contains initial vocabulary and all the merges.
+    \item The rare words are broken down into two or more subwords.
+    \item At test time, the input word is split into a sequence of characters, and the characters are merged into a larger and known symbols.
+    \item Languages such as Japanese and Korean are non-segmented, we can use language specific morphology based word segmenters.
+    \item Changing merge order will give different outputs in BPE. Therefore, BPE is greedy and deterministic.
+    \item A repo for BPE: \url{https://github.com/karpathy/minbpe/tree/master}
+    \item \textbf{BPE Dropout}: \url{https://arxiv.org/pdf/1910.13267.pdf}
+    \item \textbf{Word Piece Tokenizer}: In BPE, we merged a pair of tokens with most frequency of occurrence. If there was a tie, we took the first occurring element.
+    \item Instead, now we calculate a score $\frac{count(\alpha,\beta)}{count(\alpha)count(\beta}$ which allows us to select a pair of tokens where the individual tokens are less frequent in the vocabulary.
+    \item Merge the pair with the highest score.
+    \item \textbf{Sentence Piece Tokenizer}: Start with a large vocabulary and shrink it. 
+    \item The probabilistic approach is to find the subword sequence $x^*\in \{x_1,x_2,...,x_k\}$ that maximizes the likelihood of the word $X$.
+    \item The word $X$ in sentence piece means a sequence of characters or words (without spaces)
+    \item Therefore, it can be applied to languages (like Chinese and Japanese) that do not use any word delimiters in a sentence.
+    \begin{enumerate}
+        \item Construct a reasonably large seed vocabulary using BPE or Extended Suffix Array algorithm.
+        \item \textbf{E-Step}: Estimate the probability for every token in the given vocabulary using frequency counts in the training corpus
+        \item \textbf{M-Step}: Use Viterbi algorithm to segment the corpus and return optimal segments that maximizes the (log) likelihood.
+        \item Compute the likelihood for each new subword from optimal segments
+        \item Shrink the vocabulary size by removing top of subwords that have the smallest likelihood.
+        \item Repeat step 2 to 5 until desired vocabulary size is reached
+    \end{enumerate}
+    \item HF tokenizers module provides a class that encapsulates all of these components.\\
+    \verb|from tokenizers import Tokenizer|
+    \item We can customize each step of the tokenizer pipeline via the setter and getter properties of the class.
+    \item We do not need to call each of these methods sequentially to build a tokenizer.
+    \item After setting Normalizer and Pre-Tokenizer, we just need to call the train methods to build the vocabulary.
+    \item Once training is complete, we can call methods such as encode for encoding the input string.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{Degree//static/DLP_Tokenizer_Pipeline.png}
+        \caption{Tokenizer Pipeline}
+    \end{figure}
+    \item We will try to build the pipeline\\
+    normalizer(Lowercase) $\to$ pre tokenizer(Whitespace) $\to$ model(BPE) $\to$ post processor(None)
+    \vspace{-1mm}
+    \begin{verbatim}
+        from tokenizers.normalizers import Lowercase
+        from tokenizers.pre_tokenizers import Whitespace
+        from tokenizers.models import BPE
+    \end{verbatim}
+    \vspace{-7mm}
+    \item Initiate the tokenizer with the BPE model and the special tokens, for example $[UNK]$, that the model will use during \textbf{prediction}.
+    \vspace{-1mm}
+    \begin{verbatim}
+        model = BPE(unk_token="[UNK]")
+        tokenizer = Tokenizer(model)
+    \end{verbatim}
+    \vspace{-7mm}
+    \item Add the normalizer and pre-tokenizer to the pipeline
+    \vspace{-1mm}
+    \begin{verbatim}
+        tokenizer.normalizer = Lowercase()
+        tokenizer.pre_tokenizer = Whitespace()
+    \end{verbatim}
+    \vspace{-7mm}
+    \item Similarly, we can customize each step of the tokenizer pipeline\\
+    \verb|model, normalizer, pre_tokenizer,|
+    \verb|post_processor, padding(no setter), truncation(no setter), decoder|
+    \item Tokenizer also provides a set of methods for training, encoding inputs, decoding, etc. \url{https://huggingface.co/docs/tokenizers/api/tokenizer}
+    \item We do not need to call each of these methods sequentially to build a tokenizer
+    \item After setting Normalizer and Pre-Tokenizer, we just need to call the train methods to build the vocabulary
+    \item Once the training is complete, we can call methods such as \verb|encode| for encoding the input string
+    \item We can customize the output behavior by passing the instance of \verb|Encode| object to the \verb|post_process()| methods of Tokenizer (it is used internally, we can just set the desired formats in the optional parameters like "pair" in \verb|encode()|)
+    \item Colab Notebook: \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/Tokenizer.ipynb}
+    \item Week 2 assignment: \url{https://colab.research.google.com/drive/1TbnvAPEPH7akUPlbdxNRIuBPxYskhMkW}
+\end{itemize}
+
+\pagebreak
+\section{Large Language Models}
+\subsection{Training and Fine-Tuning}
+\begin{itemize}
+    \item Training a new transformer for different tasks can be tedious, so instead we train the transformer such that the output is conditioned on the input prompt.
+    \item Can a model develop basic understanding of language by getting exposure to a large amount of raw text? \textbf{[pre-training]}
+    \item More importantly, after getting exposed to such raw data can it learn to perform well on downstream tasks with minimum supervision? \textbf{[Supervised Fine-tuning]}
+    \item A simple way to make a model understand language is to Teach it the task of predicting the next token in a sequence
+    \item Roughly speaking, this task of predicting the next token in a sequence is called language modelling
+    \item We can also use autoregressive models where the conditional probabilities are given by parameterized functions with a fixed number of parameters (like transformers).
+    \item GPT is trained on Causal Language Modeling objective, which is
+    \begin{equation*}
+        L=\sum_{i=1}^T\log{P(x_i|x_1,...,x_{i-1};\theta)}
+    \end{equation*}
+    \item Consider a tokenizer with vocabulary size $|V|$ and embedding dimension $E$.
+    \item Consider a model that contains 12 decoder layers, with context size $C$, $A$ attention heads and FFN hidden layer size $E\times 4=H$.
+    \item Number of Parameters
+    \begin{enumerate}
+        \item Token Embeddings: $|V|\times E$
+        \item Position Embeddings: $C\times E$
+        \item Attention Parameters per block, $W_Q=W_K=W_V=E\times E/A$
+        \item Per attention head: $3\times W_Q$
+        \item For $A$ heads: $3\times W_Q\times A=AP$
+        \item For Linear Layer in attention block: $E\times E=L$
+        \item For all 12 blocks: $12\times(L+AP)$
+        \item FFN parameters per block: $2\times(E\times H)+E+H=FFN$
+        \item For 12 blocks: $12\times FFN$
+        \item Total Parameters: $|V|\times E+C\times E+12\times(L+AP)+12\times FFN$
+    \end{enumerate}
+    \item Pipeline for training\\
+    \fbox{Dataset} $\to$ \fbox{Tokenizer} $\to$ \fbox{DataLoader} $\to$ \fbox{Initialize the Model} $\to$ \fbox{Train the Model}
+    \item Colab Notebook: \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/PreTraining_GPT.ipynb}
+\end{itemize}
+
+\subsection{Task Specific Fine-Tuning}
+\begin{itemize}
+    \item We trained the GPT-2 model with the CLM(Causal Language Modeling) training objective
+    \item One approach for using the pre-trained models for downstream tasks is to individually fine-tune the parameters of the model for each task.
+    \item We make a copy of the pre-trained model for each task and fine-tune it on the dataset specific to that task.
+    \item Stanford Sentiment Tree Bank(SST) for sentiment classification
+    \item SNLI for classification tasks
+    \item LAMBADA for predicting the last word of a long sentence.
+    \item \textbf{Fine-tuning} involves adapting a model for various downstream tasks, with a minimal or no change in the architecture.
+    \item Initialize the parameters with the parameters learned by solving the pre-training objective.
+    \item At the input side, add additional tokens based on the type of downstream task. For example, $\langle s\rangle$ and end $\langle e\rangle$ tokens for classification tasks.
+    \item At the output side, replace the pre-training LM head with the classification head (a linear layer $W_y$)
+    \item Now our objective is to predict the label of the input sequence
+    \begin{equation*}
+        \hat{y}=P(y|x_1,...,x_m)=softmax(W_yh_l^m)
+    \end{equation*}
+    \item It makes sense as the entire sentence is encoded only at the last time step due to causal masking.
+    \item $W_y$ is randomly initialized. Padding or truncation is applied if the input sequence is less or greater than the context length.
+    \item We can freeze the pre-trained model parameters and randomly initialize the weights of the classification head while training the model.
+    \item In this case, the pre-trained model acts as a feature extractor and the classification head act as a simple classifier.
+    \item The other option is to train all the parameters of the model, which is called \textbf{full fine-tuning}.
+    \item In general, the latter approach provides better performance on downstream tasks than the former.
+    \item Many approaches have been developed to tackle the memory requirement to fine-tune large models.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{Degree//static/DLP_Memory_Approaches.png}
+        \caption{Different Approaches to tackle memory requirements}
+    \end{figure}
+    \item Of these Parameter Efficient Fine-Tuning (PEFT) techniques, LoRa, QLoRa and AdaLoRa are most commonly used (optionally, in combination with quantization)
+    \item \textbf{Guide to PEFT}: \url{https://arxiv.org/abs/2303.15647}
+    \item Fine-tuning large models is costly, as it still requires thousands of samples to perform well in a downstream task.
+    \item Some tasks may not have enough labelled samples.
+    \item Moreover, this is not how humans adapt to different tasks once they understand the language.
+    \item \textbf{Language Models for few shot Learners}: \url{https://arxiv.org/pdf/2005.14165}
+    \item We want a single model that learns to do multiple tasks with zero or few examples
+    \item We adapt a pre-trained language model for downstream tasks witout any exploit supervision, called \textbf{zero-shot transfer}.
+    \item The prompts are words. Therefor, we just need to change the single task(LM) formulation
+    \begin{equation*}
+        \text{Change }p(output|input)\text{ to multitask }p(output|input,task)
+    \end{equation*}
+    \item To get a good performance, we need to scale up both the model size and the data size.
+    \item The ability to learn from a few examples improves as model size increases.
+    \item For certain tasks, the performance is comparable to that achieved through full task-specific fine-tuning.
+    \item Since the model learns a new task from samples within the context window, this approach is called \textbf{in-context learning}.
+    \item This remarkable ability enables the adaptation of the model to downstream tasks without the need for gradient-based fine-tuning.
+    \item Adaptation happens on-the-fly in inference mode (which consumes far less memory)
+    \item Since adaptation occurs during inference, there is \textbf{ no need to share} model weights for fine-tuning.
+    \item This approach enables the model's deployment across a variety of use cases through simple API calls, making it more accessible.
+    \item This new ability paved the way for fine-tuning the model for specific tasks by Prompting.
+    \item There are multiple ways of prompting the model, \textbf{Zero-shot}, \textbf{Few-shot (in-context)}, \textbf{Chain of Thought}, \textbf{Prompt Chaining}.
+    \item Zero-shot learning performance is often poor, despite the model size (say, GPT 3 175B), especially in following the user intent (instructions).
+    \item Fine-tune the model on the instructions, one approach is to reformat at the available datasets into instruction sets.
+    \item \textbf{Fine-Tuned Language Models are Zero Shot Learners}: \url{https://arxiv.org/pdf/2109.01652}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{Degree//static/DLP_FLAN.png}
+        \caption{FLAN}
+    \end{figure}
+    \item "Making language models bigger does not inherently make them better at following a user’s intent.", \href{https://arxiv.org/pdf/2203.02155}{Training language models to follow instructions with human feedback}
+    \item Language Modelling objective is "misaligned" with user intent. Therefore, we must fine-tune the model to align with the user intent. This requires human labelled demonstrations for a collection of prompts (a labor-intensive task)
+    \item Use these collections to fine-tune (Supervised Fine-Tuning, SFT) the model using Reinforcement Learning from Human Feedback (RLHF)
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{Degree//static/DLP_RLHF.png}
+        \caption{Preference Tuning via RLHF}
+    \end{figure}
+    \item Fine-Tuning can be broadly categorized into two categories, Supervised Fine-Tuning(SFT) and Prompt Tuning.
+    \item \textbf{Supervised Fine-Tuning}: Task-specific Full Fine-tuning, (task agnostic) Instruction-tuning, Memory efficient fine-tuning(PEFT, Quantization).
+    \item \textbf{Prompt tuning}: Zero-shot, few-shot, Chain of Thought, Prompt chaining, Meta prompting
+    \item Additional Modules: \verb|peft|, \verb|trl,SFTTrainer| (for preference tuning), \verb|bitsandbytes| (quantization), \verb|Unsloth| (for single-GPU, $2.5\times$ faster training)
+    \item Continued Pretraining of Llama 3.2 1B: \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/ContPreTrain-Peft-quantize.ipynb}
+    \item Task-specific fine-tuning (classification): \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/Task-Specific-FineTuning.ipynb}
+    \item Task-Specific fine-tuning with LoRA: \url{https://github.com/Arunprakash-A/Modern-NLP-with-Hugging-Face/blob/main/Notebooks/Task-Specific-FineTuning-LoRA.ipynb}
+    \item Instruction tuning with unsloth: \url{https://colab.research.google.com/drive/1Ys44kVvmeZtnICzWz0xgpRnrIOjZAuxp?usp=sharing}
+\end{itemize}
+
+\pagebreak
+\section{Speech and Audio Processing}
+\subsection{Language Identification}
+\begin{itemize}
+    \item We want to identify the language given the speech signal.
+    \item The basic unit of text is character.
+    \item Similarly, speech has a basic unit called \textbf{phenom}.
+    \item We use Wave2Vec model to extract features from audio files and then use any ml/DL model for classification.
+    \item \textbf{Wav2Vec2Processor}
+    \begin{enumerate}
+        \item The processor is responsible for preprocessing and post-processing audio data.
+        \item It converts raw audio waveforms (e.g., .wav files) into a numerical format suitable for input to the model.
+        \item Typically includes: Feature extraction (e.g., converting waveform to normalized values), Tokenization (if the model outputs text), decoding (if needed for post-processing).
+        \item Combines Wav2Vec2FeatureExtractor (extracts features from raw audio) and Wav2Vec2Tokenizer (converts model outputs into readable text).
+    \end{enumerate}
+    \item \textbf{Wav2Vec2Model}
+    \begin{enumerate}
+        \item The model is responsible for the actual deep learning computations on the processed audio input.
+        \item It takes the preprocessed features and applies a self-supervised learning approach to extract speech representations.
+        \item The model can be: Pretrained (outputting hidden representations) or Fine-tuned for Automatic Speech Recognition (ASR) (outputting text or phonemes).
+        \item Wav2Vec2Model: Outputs raw speech embeddings (requires additional layers for ASR).
+        \item Wav2Vec2ForCTC: Fine-tuned for speech-to-text (outputs transcriptions directly).
+    \end{enumerate}
+    \item Colab Notebook: \url{https://colab.research.google.com/drive/1siXesgyxS6JFOVdIDeqbpaKE5YKa0E5u}
+\end{itemize}
+
+\subsection{Speaker Diarization}
+\begin{itemize}
+    \item \textbf{Speaker Diarization} is the process of dividing an audio recording into segments based on who is speaking
+    \item We will solve this in a roundabout way by using speech to text, then using a speaker identification model.
+    \item \textbf{Whisper} will be used to perform speech to text
+    \item Then we extract features of the speech and perform clustering.
+    \item We will use agglomerative clustering.
+    \item Complete pipeline is given as\\
+    \fbox{Preprocessing} $\to$ \fbox{ASR(speech-to-text)} $\to$ \fbox{Speaker Embedding Extraction} $\to$ \fbox{Clustering} $\to$ \fbox{Post-processing}
+    \item Post-processing step can be ignored
+    \item \textbf{FFmpeg tool}
+    \begin{enumerate}
+        \item command-line tool for processing multimedia files.\\
+        \verb|!ffmpeg -i "{audio_file_path}" -ar 16000 -ac 1 -c:a pcm_s16le "{audio_file_path[:-4]}.wav"|
+        \item \verb|-i "{audio_file_path}"|: Specifies the input file 
+        \item \verb|-ar 16000|: Sets the audio sampling rate to 16,000 Hz (often used in ASR models like Whisper).
+        \item \verb|-ac 1|: Converts the audio to mono (1 channel) instead of stereo.
+        \item \verb|-c:a pcm_s16le|: Specifies the audio codec: PCM (Pulse Code Modulation), 16-bit little-endian. This is a raw, uncompressed format that many speech-processing models prefer.
+        \item \verb|"{audio_file_path[:-4]}.wav"|: Saves the output file with a .wav extension by removing the last 4 characters (e.g., ".mp3") from the original file name.
+    \end{enumerate}
+    \item \textbf{PretrainedSpeakerEmbedding("speechbrain/spkrec-ecapa-voxceleb")}
+    \begin{enumerate}
+        \item Converts an audio waveform into a fixed-dimensional speaker embedding (a numerical representation of the voice).
+        \item Used for speaker identification, verification, and clustering.
+        \item Pretrained on a large dataset of speech recordings from thousands of speakers. 
+    \end{enumerate}
+    \item \textbf{Whisper}
+    \begin{enumerate}
+        \item Automatic Speech Recognition (ASR) model that transcribes spoken audio into text.
+        \item Can handle multiple languages and noisy environments.
+        \item Uses a Transformer-based architecture for speech-to-text.
+        \item Outputs timestamps for words, allowing alignment with speaker diarization.
+        \item Can be used for real-time transcription and subtitle generation.
+        \item Often used in voice assistants, captioning, and speech-to-text applications.
+    \end{enumerate}
+    \item Colab Notebook: \url{https://colab.research.google.com/drive/1zTBuD8vWh9oCpnuasiWKtjOK0o3_xuiA#scrollTo=Kea-qNf1HWOG}
+\end{itemize}
+
+\subsection{Automatic Speech Recognition}
+\begin{itemize}
+    \item In the previous problem, we identified who said when, now we want to identify who said what.
+    \item We are interested in speech-to-text.
+    \item \textbf{Wav2Vex2CTCTokenizer}
+    \begin{enumerate}
+        \item Converts text into tokens and vice versa.
+        \item Since CTC models do not predict space-separated words, they need a word delimiter token($|$) instead of a space.
+        \item Handles unknown tokens, padding, and delimiter formatting.
+    \end{enumerate}
+    \item \textbf{Wav2Vec2FeatureExtractor}
+    \begin{enumerate}
+        \item Converts raw waveforms into features that the model can process.
+        \item Applies normalization to the waveform.
+        \item Handles padding and setting up the sampling rate.
+        \item \verb|feature_size=1|: Represents how many channels the input has (1 for mono audio).
+        \item \verb|padding_value=0.0|: The value used for padding if sequences are different lengths.
+        \item \verb|return_attention_mask=False|:Unlike text models, Wav2Vec2 doesn’t require an attention mask.
+    \end{enumerate}
+    \item \verb|processor = Wav2Vec2Processor(feature_extractor=feature_extractor, tokenizer=tokenizer)| will combine both the feature extractor (for audio processing) and tokenizer (for text processing). Essentially acting as a single interface to process audio input from waveform to tokenized text.
+    \item \textbf{DataCollatorCTCWithPadding}: Custom class made to help batch different-length audio samples by applying padding dynamically. Ensures that each batch has sequences of the same length for efficient training.
+    \item \textbf{Word Error Rate(WER)}: measures how different the model’s predictions are from the correct transcriptions.
+    \begin{equation*}
+        WER=\frac{\text{Substitutions}+\text{Insertions}+\text{Deletions}}{\text{Total Word in Reference}}
+    \end{equation*}
+    \item A low WER is good
+    \item \textbf{AutoModelForCTC.from$\_$pretrained("facebook/wav2vec2-base")}
+    \begin{enumerate}
+        \item Loads the pretrained Wav2Vec2 model 
+        \item Uses CTC loss, which is designed for sequence-to-sequence transcription without explicit alignment.
+        \item Uses the vocabulary size and padding token from the tokenizer.
+        \item \verb|ctc_loss_reduction="mean"|: Computes CTC loss by averaging over all characters in a batch.
+        \item \verb|pad_token_id=processor.tokenizer.pad_token_id|: Ensures proper handling of padding tokens.
+        \item \verb|vocab_size=len(processor.tokenizer)|: Sets the vocabulary size dynamically based on the tokenizer.
+    \end{enumerate}
+    \item Colab Notebook: \url{https://colab.research.google.com/drive/1NQ3XY0O9qGvYhrchTc5YOH1MNyp6Ff9R#scrollTo=xrLfzHtD99Y_}
+\end{itemize}
+
+\subsection{Text-to-Speech}
+\begin{itemize}
+    \item Automatically generate speech corresponding to given text.
+    \item \textbf{Synthesized audio}: natural and intelligible speech
+    \item \textbf{Frameworks}: Unit selection synthesis(USS), Hidden Markov Model based(HTS), Neural network based(conventional), End-to-End(E2E)
+    \item \textbf{Training data}: text, audio pairs, continuous speech
+    \item Given a text, using a lexicon/dictionary, convert it to a sequence of phenoms
+    \item \textbf{Vocoder} converts Mel spectrogram(sequence of vectors) to speech.
+    \item Along with text, we can add another feature embedding, speaker.
+    \item \textbf{Unit Selection Synthesis}: select and concatenate units from large speech database. Natural sounding speech however requires a large database and discontinuities perceived at concatenation points.
+    \item \textbf{Hidden Markov Model(HTS)}: Instead of storing actual waveform units, models of units stored. Based on source-filter model of speech. Extraction of features, source($\log{f_0}$) and system(MFCC)
+    \item \textbf{Parametric}: speech is described using parameters
+    \item \textbf{Statistical}: parameters are described using statistics (mean, variance of probability density functions)
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{Degree//static/DLP_HTS.png}
+        \caption{Training and Synthesis phases of HTS}
+    \end{figure}
+    \item \textbf{Training}: Feature extraction from aligned $\langle$text, speech$\rangle$ data. Every phone is modeled by a 3-state HMM (Each state has a GMM).
+    \item \textbf{Synthesis}: Text for synthesis is broken into constituent phones, corresponding HMMs selected and concatenated– sentence HMM. Generates acoustic features which is fed to a vocoder for synthesis
+    \item \textbf{Challenges with Handling Context}: Some combinations not available in the training data. Unseen combinations present in the test sentence
+    \item \textbf{Advantages}: Low amount of training data, Small footprint size (few MBs), Fast synthesis, and Flexible, tune HMM parameters to vary speaking style, emotion
+    \item Load the dataset first
+    \item However, voice quality relatively poor.
+    \item \textbf{Neural Network based TTS}: Learn the mapping between linguistic and acoustic feature vectors using neural network. It has better quality compared to HTS, however, requires more training data to produce good quality speech.
+    \item \textbf{WaveNet}: An autoregressive model, \url{https://arxiv.org/abs/1609.03499}
+    \item It has causal convolution, faster training because of no recurrent connections.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\linewidth]{Degree//static/DLP_TTS.png}
+        \caption{A complete TTS System}
+    \end{figure}
+    \item \textbf{End-to-End synthesis}: Speech directly synthesized from characters. No need of developing separate modules (parsing, alignment). Allows rich conditioning on speaker, language, high-level features. Single model likely more robust than multi-stage model
+    \item \textbf{Tacotron2}: Encoder and attention-based decoder and Vocoder, \url{https://arxiv.org/abs/1712.05884}
+    \item \textbf{Issues with autoregressive models}: Synthesized speech is not robust has repetitions and word skips (error propagation, wrong attention alignments between text and speech), Slow inference speed, Lack of control over speed and prosody
+    \item \textbf{FastSpeech}: Architecture based on Feed-forward Transformer, \url{https://arxiv.org/abs/1905.09263}
+    \item \textbf{FastSpeech2}: \url{https://arxiv.org/abs/2006.04558}
+    \item \textbf{VITS}: \url{https://arxiv.org/abs/2106.06103}
+    \item \textbf{JETS}: \url{https://arxiv.org/abs/2203.16852}
+    \item End-to-End gives high quality speech and is easy to train, however, requires a huge amount of training data and is computationally intensive
+    \item \textbf{Neural Vocoders}: WaveNet, WaveGlow, Parallel WaveGAN, MelGAN, Multi-band MelGAN, HiFiGAN, StyleMelGAN
+    \item \textbf{Objective measures}: Mel-cepstral distortion scores
+    \item \textbf{Subjective measures}: Mean opinion score (MOS), Degradation mean opinion score (DMOS), Pairwise comparison (PC) test
+    \item \textbf{Research Areas}: Multilingual aspects bilingual, code-mixing,  Prosody expressive voice, emotional TTS, Voice conversion, Conversational speech
+    \item \textbf{SpeechT5Processor}
+    \begin{enumerate}
+        \item Converting text into speech waveforms.
+        \item Supports multi-speaker synthesis using speaker embeddings.
+        \item Extract tokenizer using \verb|processor.tokenizer|
+    \end{enumerate}
+    \item \textbf{EncoderClassifier}
+    \begin{enumerate}
+        \item Loads a speaker embedding model, which extracts speaker characteristics from audio.
+        \item Used for multi-speaker TTS, where the model mimics a specific voice.
+    \end{enumerate}
+    \item \textbf{SpeechT5ForTextToSpeech}: Converts text input + speaker embedding into a speech waveform.
+    \item \textbf{SpeechT5HifiGan}: SpeechT5 generates a mel spectrogram, which HiFi-GAN converts to waveform.
+    \item Obtaining satisfactory results from this model on a new language can be challenging. The quality of the speaker embeddings can be a significant factor.
+    \item If the synthesized speech sounds poor, try using a different speaker embedding.
+    \item Increasing the training duration is also likely to enhance the quality of the results.
+    \item Another thing to experiment with is the model’s configuration. For example, try using $config.reduction\_factor = 1$ to see if this improves the results.
+    \item Colab Notebook: \url{https://colab.research.google.com/drive/1uOxGeJxP95-YaSX9JK1z1aAm8im29sFR#scrollTo=6KcjGUttYUFE}
+\end{itemize}
+
+\pagebreak
+\section{Computer Vision}
+\subsection{Introduction}
+\begin{itemize}
+    \item \textbf{Goal}: To extract "meaning" from pixels
+    \item \textbf{Semantic Information}: Object categorization, Scene and context categorization, Image Segmentation, Object Tracking, Pose Estimation, Image Captioning, etc.
+    \item \textbf{Metric Information}: Depth from image, Structure from motion, photometric stereo etc.
+    \item \textbf{Challenges}: Viewpoint variation, Illumination, Scale, Deformation, Occlusion, Background clutter, motion, Object intra-class variation.
+    \item CNNs leverage Local connectivity, Parameter sharing, Pooling/ Subsampling, ReLu (rectifier) nonlinearity
+\end{itemize}
+
+\subsection{Object Recognition}
+\begin{itemize}
+    \item \textbf{Image classification}: A core problem in computer vision
+    \item AlexNet uses filters of size $11\times 11$ in the initial layer.  It increases the number of parameters that need to be trained
+    \item Recent CNNs uses a cascade of small filters of size $3\times 3$ or $5\times 5$.
+    \item VGGNet uses a stack of three $3\times 3$ conv (stride 1) layers which has the same effective receptive field as one $7\times 7$ conv layer, but deeper, more non-linearities.
+    \item \textbf{Inception Module}: Design a good network topology(network within a network) and then stack these modules on top of each other.
+    \item GoogleLeNet uses $1\times 1$ conv layers which preserve spatial dimensions, but reduces depth.
+    \item ResNet introduces residual layers, essentially and identity mapping on $X$ aka skip connections.
+    \item Image Classification Tutorial: \url{https://www.kaggle.com/code/advaitkisar/dlp-image-classification-tutorial}
+    \item Image Classification using Pretrained Models: \url{https://www.kaggle.com/code/advaitkisar/dlp-pretrained-models}
+\end{itemize}
+
+\subsection{Object Detection}
+\begin{itemize}
+    \item The task of assigning a label and a bounding box to all objects in the image
+    \item We can do this by sliding a window in the image and then using an image classifier.
+    \item Since there are too many region proposals, it is only good when classifier is fast.
+    \item Convolutional Networks are computationally demanding, we cannot go through all the proposals.
+    \item So, we simply pick "good" proposals, find "blobs" that are likely to contain objects. This is a "class-agnostic" approach.
+    \item \textbf{RCNN}: \url{https://arxiv.org/abs/1311.2524}\\
+    \fbox{Input Image} $\to$ \fbox{Extract Region Proposals} $\to$ \fbox{Compute CNN features} $\to$ \fbox{Classify Regions}
+    \item Ad hoc training objective
+    \begin{enumerate}
+        \item Fine-tune network with softmax classifier (log loss)
+        \item Train post-hoc linear SVMs (hinge loss)
+        \item Train post-hoc bounding box regressions (least squares)
+    \end{enumerate}
+    \item Training is slow and takes a lot of disk space.
+    \item \textbf{SPP Net}: \url{https://arxiv.org/abs/1406.4729}
+    \item \textbf{Fast RCNN}: \url{https://arxiv.org/abs/1504.08083}
+    \item Fast R-CNN improved SPP-Net by making it end-to-end trainable
+    \item Forward entire image through a convolutional network to generate regions of interest, then use single level SPP to get region of interests.
+    \item Then forward these to FFN, which then classifies the image, and predicts bounding box
+    \item \textbf{Out-of-network region proposals}: We are proposing regions outside the main network instead of doing end-to-end prediction.
+    \item RPN replaced Selective Search with a trainable proposal mechanism.
+    \item \textbf{Faster RCNN}: \url{https://arxiv.org/abs/1506.01497}
+    \item Solely based on CNNs, and each step is end-to-end.
+    \item Use CNNs to get a region map, pass this region map to a region proposal network, and combine the output of RPN with this region map.
+    \item RPN slides a small window in the feature map, a small model classifies between object or not object and regresses bounding box location.
+    \item Position of the sliding window provides localization information with reference to the image.
+    \item Box regression provides finer localization information with reference to this sliding window.
+    \item The above approaches have a separate model for region proposal, need to run classification multiple times and looks at limited part of the image at a time(lacks contextual information).
+    \item \textbf{YOLO}: \url{https://arxiv.org/abs/1506.02640}
+    \item A single neural network for localization and classification, need to inference only once, and looks at entire image each time leading to less false positives.
+    \begin{enumerate}
+        \item First, image is split into a $S\times S$ cells.
+        \item For each cell, generate $B$ bounding boxes
+        \item For each bounding box, there are 5 predictions: x, y, w, h, confidence
+        \item For each cell, we need to also do object classification.
+        \item Each cell also predicts a class probability conditioned on object being present.
+    \end{enumerate}
+    \item \textbf{Mean Average Precision(mAP)}: measure of how well the detector is able to localize and classify the objects in a image. It is based on the concepts of Confusion Matrix, Intersection Over Union (IoU), Precision and Recall.
+    \item Average precision is the area under the precision-recall curve.
+    \item mean average precision is the mean of average precision across all classes.
+    \item YOLO version 2
+    \begin{enumerate}
+        \item \textbf{Anchor Boxes}: Introduced the concept of anchor boxes to improve object localization and handle varying aspect ratios. This allowed the model to predict bounding boxes more efficiently by utilizing predefined shapes.
+        \item \textbf{Dimension Clusters}: Employed k-means clustering to calculate the most optimal set of anchor box sizes specific to the dataset. This improved precision by ensuring better alignment between anchor boxes and the objects in the dataset.
+    \end{enumerate}
+    \item YOLO version 5
+    \begin{enumerate}
+        \item \textbf{AutoAnchor}: Introduced automatic anchor box generation, which adapts anchor boxes based on the dataset's distribution without requiring manual intervention. This further optimized the model's ability to detect objects of different sizes and shapes across various datasets.
+        \item \textbf{Augmentation Strategies}: Incorporated Mosaic and MixUp data augmentation techniques to improve generalization and robustness during training. These augmentations enhanced model performance, particularly in scenarios with limited or highly varied data.
+    \end{enumerate}
+    \item RCNN Tutorial: \url{https://colab.research.google.com/drive/1l_XnSYjAZOFE8f5fDI2BhrteH-MikUeH}
+    \item YOLO Tutorial: \url{https://colab.research.google.com/drive/1CDRH7n6rHYyTqas1w9hZe0LKWBK_6R-W}
+\end{itemize}
+
+\subsection{Depth Estimation}
+\begin{itemize}
+    \item Estimate Pixel-level depth relative to camera position.
+    \item \textbf{Applications}: Autonomous navigation, Virtual/Augmented Reality, Scene understanding
+    \item \textbf{Depth from Stereo}: We can use two images taken from different angles to get the 3D reconstruction, and as such the depth.
+    \item Depth estimation from a single image is difficult.
+    \item Depth cues like parallax is missing
+    \item Some cues that exist are vanishing points, object sizes etc
+    \item These cues cannot be quantified through a rule based method
+    \item \textbf{Multi-Scale Deep Network}: \url{https://arxiv.org/abs/1406.2283}
+    \item Entire network is divided into 2 parts, coarse and fine network.
+    \item Coarse network predicts the overall depth for the scene
+    \item Fine network refines the global prediction locally
+    \item Coarse network needs larger receptive field and is hence more deep compared to the fine network
+    \item \textbf{UNet}: \url{https://arxiv.org/abs/1505.04597}
+    \item This is also divided into 2 parts, Encoder Downsampling Network and Decoder Upsampling Network
+    \item Encoder uses convolutional layers followed by max pooling to progressively reduce spatial dimensions while increasing the number of feature channels. Captures high-level features and context in the image.
+    \item Decoder involves transposed convolutions (or upsampling layers) to increase the spatial dimensions of feature maps. Combines low-level features from the downsampling path with high-level features to produce detailed output depth maps.
+    \item Also has skip connections, directly connect corresponding layers in the downsampling path to the upsampling path. Preserve spatial information lost during downsampling, allowing for more precise reconstructions in the output.
+    \item skip connections allow fine-grained spatial details to be recovered
+    \item MSE is commonly used in depth estimation, MAE can also be used.
+    \item \textbf{Unsupervised Monocular Depth Estimation with Left-Right Consistency}: \url{https://arxiv.org/abs/1609.03677}
+    \item Deep learning requires tons of training data for supervised learning. For depth estimation, you need the image depth map pairs.
+    \item disparity maps are used to generate a second view from a single image.
+    \item Usethe leftt image of the stereo pair to predict the disparity. True disparity is not available for training
+    \item Now, transform the left image to right image using the predicted disparity. True right image is available and can be used for supervision
+    \item At test time network predicts disparity map from only a single image
+    \item UNet Depth Map Prediction: \url{https://colab.research.google.com/drive/1jlm3BX_Tgd5h_KpaCQOWACiCFCDHARx2}
+\end{itemize}
+
+\subsection{Image Enhancement}
+\begin{itemize}
+    \item Most common image preprocessing tasks: Denoising, Super Resolution, Deblurring
+    \item \textbf{Sources of Noise}: Photon shot noise, read noise, quantization noise, etc.
+    \item \textbf{Multi-Stage Progressive Image Restoration}: \url{https://arxiv.org/abs/2102.02808}
+    \item Learns the contextualized features using encoder-decoder architectures and later combines them with a high-resolution branch that retains local information.
+    \item Multi-stage architecture progressively refines image quality across several stages.
+    \item Parallel branches extractmultiscalee features for capturing both local and global information.
+    \item Each stage outputs intermediate results, passed to the next for further enhancement.
+    \item The encoder-decoder subnetwork is based on the standard U-Net architecture.
+    \item It incorporates Channel Attention Blocks (CABs) for enhanced feature extraction at multiple scales.
+    \item Bilinear upsampling followed by convolution is used to increase spatial resolution
+    \item Channel attention map is for exploiting the inter-channel relationship of features. 
+    \item Channel attention focuses on ‘what’ is meaningful given an input image. To compute the channel attention, the spatial dimension of the input feature map is squeezed using average-pooling and max-pooling, generating two different spatial context descriptors.
+    \item Both descriptors are then forwarded to a shared network to produce the channel attention map 
+    \item \textbf{Original Resolution Subnetwork (ORSNet)}: Preserves fine details in image restoration. Operates without downsampling, producing spatially-enriched high-resolution features. Composed of multiple Original-Resolution Blocks (ORBs), each containing Channel Attention Blocks (CABs).
+    \item \textbf{Cross-stage Feature Fusion (CSFF) module}: CSFF is integrated between encoder-decoders and between the encoder-decoder and ORSNet. Features from one stage are refined using 1×1 convolutions before being passed to the next stage for aggregation. Reduces information loss, enhances feature enrichment across stages, and stabilizes the network optimization process, facilitating the addition of more stages.
+    \item \textbf{Supervised Attention Module (SAM)}: Introduced between stages to improve performance in multi-stage image restoration networks. SAM provides ground-truth supervisory signals for progressive image restoration at each stage. It generates attention maps to suppress less informative features, allowing only useful features to propagate to the next stage.
+    \item At any given stage $S$, instead of directly predicting a restored image $X_s$, the model predicts a residual image $R_s$ to which the degraded input image $I$ is added to obtain: $X_s = I + R_s$. 
+    \item The loss function is given as
+    \begin{equation*}
+        \begin{split}
+            L=\sum_{S=1}^3[L_{char}(X_s,Y)+\lambda L_{edge}(X_s,Y)]\\
+            L_{char}=\sqrt{\lVert X_s-Y\rVert^2+\epsilon^2}=\text{Charbonnier loss}\\
+            L_{edge}=\sqrt{\lVert \Delta(X_s)-\Delta Y\rVert^2+\epsilon^2}=\text{edge loss}
+        \end{split}
+    \end{equation*}
+    where $Y$ is the ground truth, $\epsilon=10^{-3}$ and $\lambda=0.05$
+    \item \textbf{Super-Resolution}: Be faithful to the low resolution input image, Produce a detailed, realistic output image
+    \item Consider a image, we blur, downsample, and noise to this image, we want to recover the original image from this output.
+    \item \textbf{Challenge}: Despite advancements in faster and deeper CNNs, recovering fine texture details during large upscaling is very difficult.
+    \item Most methods focus on minimizing mean squared error, leading to high PSNR but lacking high-frequency details and perceptual quality.
+    \item GAN drives the reconstruction towards the natural image manifold producing perceptually more convincing solutions.
+    \item \textbf{Super-Resolution GAN}: \url{https://arxiv.org/abs/1609.04802}
+    \item SRGAN is the first framework capable of generating photo-realistic images with $4\times$ upscaling factors
+    \item \textbf{Perceptual Loss Function}: Combines adversarial loss (trained to differentiate super-resolved images from real images) and content loss (based on perceptual similarity rather than pixel-wise similarity).
+    \item Utilizes a \textbf{generator (G)} and \textbf{discriminator (D)} to solve an adversarial min-max problem, where G aims to fool D into classifying generated images as real.
+    \item G generates realistic images while D tries to distinguish between super-resolved and real images, encouraging perceptually superior solutions over pixel-wise error methods like MSE.
+    \item Generator Architecture: Built using a very deep network with B residual blocks, employing 3×3 convolutional layers, batch normalization, and Parametric ReLU activations. Resolution is increased using Pixel Shuffle layers for high-quality super-resolution.
+    \item \textbf{Pixel Shuffle}: Rearranges elements in a tensor of shape $(*,C\times r^2,H,W)$ to a tensor of shape $(*,C,H\times r,W\times r)$
+    \item Discriminator Architecture: Consists of 8 convolutional layers, with 3×3 filters increasing from 64 to 512, followed by two dense layers and a sigmoid activation for binary classification between real and super-resolved images. Uses Leaky ReLU $(\alpha = 0.2)$ to maintain gradient flow for better learning. Replaces max-pooling with strided convolutions to preserve more spatial detail during downsampling.
+    \item \textbf{Sources of blur}: Camera motion, object motion, defocus, Point spread function(PSF) or blur kernel.
+    \item \textbf{LaKDNet}: \url{https://arxiv.org/abs/2302.02234}
+    \item A pure CNN model (LaKDNet) to restore sharp, high-resolution images from blurry versions.
+    \item Utilizes depth-wise convolution with large kernels to maintain efficiency while modeling long-range pixel dependencies.
+    \item \textbf{Architecture Type}: U-shaped hierarchical network consisting of symmetric encoder-decoder modules.
+    \item \textbf{Levels}: Comprises 4 levels, each containing N LaKD blocks, where N varies across levels $(N_1,N_2,N_3,N_4)$.
+    \item \textbf{Input Processing}: Takes an input image I with dimensions H×W×3 and extracts low-level features through an initial convolutional layer.
+    \item \textbf{Feature Extraction}: Passes the features into the encoder-decoder structure for blur removal, followed by a convolution layer to recover output features.
+    \item \textbf{Downsampling/Upsampling}: Utilizes pixel unshuffle for downsampling and pixel shuffle for upsampling.
+    \item \textbf{Output Formation}: Implements skip connections from input I to output Iout, resulting in a global residual structure
+    \item \textbf{LaKD Block Motivation}: Designed to explore local and global dependencies while achieving a large effective receptive field (ERF) using a fully convolutional approach.
+    \item \textbf{Submodules}: Comprises two main submodules, feature mixer and feature fusion.
+    \item \textbf{Feature Mixer}: Similar to depth-wise separable convolution, utilizing unusually large kernel sizes (e.g., 9×9). Incorporates a point-wise convolution ($1\times 1$)  Separately mixes spatial intra-channel and depth-wise inter-channel features, enabling distant spatial location mixture.
+    \item \textbf{Normal convolution}: mixes spatial and channel information
+    \item \textbf{Depth-wise convolution}: only mixes spatial information
+    \item \textbf{Point-wise convolution}: only mixes channel information
+    \item Lot of computation is saved by using depth-wise and point-wise convolution
+    \item \textbf{Feature Fusion Model}: Utilizes depth-wise convolution layers with 3×3 kernels for efficient local information encoding. Incorporates a gating mechanism with GELU activation to propagate and fuse features effectively.
+    \item Denoising Tutorial: \url{https://drive.google.com/file/d/12KVwgV40RvLniAm2XiRFi8TJwb7_-95m/view?usp=drive_link}
+    \item Super-Resolution: \url{https://drive.google.com/file/d/1eixeOQ2m3aOd4R0RUvYXqLXcSj_bvY3j/view?usp=drive_link}
+    \item Deblurring Tutorial: \url{https://drive.google.com/file/d/1jhJ-MTl2sp0uEDHEoXk2lZcbDcJePj9s/view?usp=drive_link}
+\end{itemize}
+
+\end{document}
